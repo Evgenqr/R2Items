@@ -1,16 +1,19 @@
 class ImageUoloadHelper:
-
     FIELD_TO_COMBINE_MAP = {
         'defaults': {
             'upload_postix': 'uploads'
         },
-        'Author': {
+        'Location': {
             'field': 'slug',
-            'upload_postix': 'authors'
+            'upload_postix': 'locations'
         },
-        'Book': {
+        'Monster': {
             'field': 'slug',
-            'upload_postix': 'books'
+            'upload_postix': ' monsters'
+        },
+        'Item': {
+            'field': 'slug',
+            'upload_postix': ' items'
         }
     }
 
