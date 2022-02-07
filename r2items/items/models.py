@@ -54,7 +54,8 @@ class Monster(models.Model):
     #                                 null=True,
     #                                 blank=True)
     url = models.SlugField(max_length=250, unique=True)
-    locations = models.ManyToManyField(Location)
+    locations = models.ManyToManyField(Location,
+                                       related_name="monsters_in_location")
     slug = models.SlugField(max_length=200, db_index=True, unique=True)
 
     def __str__(self):
@@ -77,6 +78,7 @@ class Monster(models.Model):
 class Item(models.Model):
     name = models.CharField(verbose_name="Предмет", max_length=150)
     description = models.TextField("Описание", null=True, blank=True)
+    weight = models.IntegerField("Вес", default=0)
     category = models.ForeignKey(Category,
                                  verbose_name="Категория",
                                  on_delete=models.CASCADE)

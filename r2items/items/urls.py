@@ -5,16 +5,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.LocationsView.as_view(), name="locations"),
-    path('monsters/', views.FilterMonstersView.as_view(), name="monsters"),
-    # path('monsters/', views.MonstersView.as_view(), name="monsters"),
-    path('items/<str:slug>/', views.ItemsView.as_view(), name="item"),
-    # path('location/<str:slug>/',
-    #      views.MonstersView.as_view(),
-    #      name='location'),
-    path('location/<int:id>/',
-         views.get_local,
+    path('monsters/<str:slug>/',
+         views.get_items,
          name='monsters'),
-    # path("<str:slug>/", views.ItemDetailView.as_view(), name="item_detail"),
+    path('location/<str:slug>/',
+         views.get_local,
+         name='locations'),
 ]
 
 
