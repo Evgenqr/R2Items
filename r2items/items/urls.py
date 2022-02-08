@@ -5,6 +5,12 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.LocationsView.as_view(), name="locations"),
+    path('signup/', views.signupuser, name='signupuser'),
+    path('logout', views.logoutuser,  name="logoutuser"),
+    path('login', views.loginuser,  name="loginuser"),
+    path('create/', views.createlocation, name='createlocation'),
+    path('createitem/', views.createitem, name='createitem'),
+    path('createmonster/', views.createmonster, name='createmonster'),
     path('monsters/<str:slug>/',
          views.get_items,
          name='monsters'),

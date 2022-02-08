@@ -1,16 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render, get_object_or_404
 from django import views
 from .models import Item, Location, Monster
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.db import IntegrityError
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
+from .forms import LocationForm, ItemForm, MonsterForm
 
 
 class LocationsView(views.View):
     def get(self, request, *args, **kwargs):
         locations = Location.objects.all()
         monsters = Monster.objects.all()
-        context = {
-            'locations': locations,
-            'monsters': monsters
-            }
+        context = {'locations': locations, 'monsters': monsters}
         return render(request, 'items/index.html', context)
 
 
@@ -21,10 +24,7 @@ def get_local(request, slug):
     else:
         monsters = Monster.objects.all()
     locations = Location.objects.all()
-    context = {
-        'monsters': monsters,
-        'locations': locations
-    }
+    context = {'monsters': monsters, 'locations': locations}
     return render(request, 'items/locations.html', context)
 
 
@@ -35,8 +35,127 @@ def get_items(request, slug):
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
-    context = {
-        'items': items,
-        'monsters': monsters
-    }
+    context = {'items': items, 'monsters': monsters}
     return render(request, 'items/monsters.html', context)
+
+
+def signupuser(request):
+    if request.method == 'GET':
+        return render(request, 'items/signupuser.html',
+                      {'form': UserCreationForm()})
+    else:
+        if request.POST['password1'] == request.POST['password2']:
+            try:
+                user = User.objects.create_user(
+                    request.POST['username'],
+                    password=request.POSt['password1'])
+                user.save()
+                login(request, user)
+                return redirect('locations')
+            except IntegrityError:
+                return render(
+                    request, 'items/signupuser.html', {
+                        'form': UserCreationForm(),
+                        'error': 'That username has already been taken'
+                    })
+        else:
+            return render(request, 'items/signupuser.html', {
+                'form': UserCreationForm(),
+                'error': 'Password did not match'
+            })
+
+
+def loginuser(request):
+    if request.method == 'GET':
+        return render(request, 'items/loginuser.html',
+                      {'form': AuthenticationForm()})
+    else:
+        user = authenticate(
+            request,
+            username=request.POST['username'],
+            password=request.POST['password'],
+        )
+        if user is None:
+            return render(
+                request, 'items/loginuser.html', {
+                    'form': AuthenticationForm(),
+                    'error': 'User or password did not match'
+                })
+        else:
+            login(request, user)
+            return redirect('locations')
+
+
+@login_required
+def logoutuser(request):
+    if request.method == 'POST':
+        logout(request)
+        return redirect('locations')
+
+
+@login_required
+def createlocation(request):
+    if request.method == 'GET':
+        return render(request, 'items/createlocation.html',
+                      {'form': LocationForm()})
+    else:
+        try:
+            form = LocationForm(request.POST,
+                                request.FILES,
+                                instance=request.user)
+            newlocaltion = form.save(commit=False)
+            newlocaltion.user = request.user
+            newlocaltion.save()
+            print('fff ', form)
+            print('newlocaltion ', newlocaltion)
+            return redirect('locations')
+        except ValueError:
+            return render(request, 'items/createlocation.html', {
+                'form': LocationForm(),
+                'error': 'Bad data passed in'
+            })
+
+
+@login_required
+def createitem(request):
+    if request.method == 'GET':
+        return render(request, 'items/createitem.html', {'form': ItemForm()})
+    else:
+        try:
+            form = ItemForm(request.POST,
+                            request.FILES,
+                            instance=request.user)
+            newitem = form.save(commit=False)
+            newitem.user = request.user
+            newitem.save()
+            return redirect('locations')
+        except ValueError:
+            return render(request, 'items/createitem.html', {
+                'form': ItemForm(),
+                'error': 'Bad data passed in'
+            })
+
+
+@login_required
+def createmonster(request):
+    if request.method == 'GET':
+        return render(request, 'items/createmonster.html',
+                      {'form': MonsterForm()})
+    else:
+        try:
+            form = MonsterForm(request.POST,
+                               request.FILES,
+                               instance=request.user)
+            newmonster = form.save(commit=False)
+            newmonster.user = request.user
+            newmonster.save()
+            return redirect('locations')
+        except ValueError:
+            return render(request, 'items/createmonster.html', {
+                'form': MonsterForm(),
+                'error': 'Bad data passed in'
+            })
+
+@login_required
+def viewitem(requset):
+    pass

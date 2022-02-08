@@ -6,28 +6,25 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="">Главная</a>
-          </li>
-                     
-          <li class="nav-item">
-            <a class="nav-link" href="">Авторизация</a>
-          </li>
+            {% if user.is.authenticated %}
+                {{ user.username }}
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/create/">Главная</a>
+                </li>
+                <form action="{% url 'logoutuser' %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit"> Выйти </button>
+                </form>
+          {% else %} 
             <li class="nav-item">
-            <a class="nav-link" href="">Регистрация</a>
-          </li>
-
-            <li class="nav-item">
-            <a class="nav-link" href="">Личный кабинет</a>
-          </li>
-            <li class="nav-item">
-            <a class="nav-link" href="">Выйти</a>
-          </li>
- 
+                <a class="nav-link" href="{% url 'loginuser' %}"> Авторизация</a>
+            </li>
+            <li class="nav-item"></li>
+                <a class="nav-link" href="{% url 'signupuser' %}"> Регистрация</a>
+            </li>
+            {% endif %}
         </ul>
       </div>
     </div>
   </nav>
   
-
-

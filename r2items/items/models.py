@@ -12,7 +12,7 @@ def monster_directory_path(instance, filename):
 
 class Category(models.Model):
     name = models.CharField(verbose_name="Название", max_length=150)
-    url = models.SlugField(max_length=250, unique=True)
+    url = models.SlugField("Ссылка", max_length=250, unique=True)
 
     def __str__(self):
         return self.name
@@ -24,10 +24,11 @@ class Category(models.Model):
 
 class Location(models.Model):
     title = models.CharField(verbose_name="Название", max_length=150)
-    local_img = models.ImageField(upload_to="media/locations",
+    local_img = models.ImageField("Изображение",
+                                  upload_to="media/locations",
                                   default=DEFAULT_IMG)
-    url = models.SlugField(max_length=250, unique=True)
-    slug = models.SlugField(max_length=200, db_index=True, unique=True)
+    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.title
@@ -48,15 +49,16 @@ class Location(models.Model):
 class Monster(models.Model):
     name = models.CharField(verbose_name="Название", max_length=150)
     description = models.TextField("Описание", null=True, blank=True)
-    monster_img = models.FileField(upload_to=monster_directory_path,
+    monster_img = models.FileField("Изображение",
+                                   upload_to="media/monsters",
                                    default=DEFAULT_IMG)
     # models.ImageField(upload_to=upload_function,
     #                                 null=True,
     #                                 blank=True)
-    url = models.SlugField(max_length=250, unique=True)
-    locations = models.ManyToManyField(Location,
+    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    locations = models.ManyToManyField(Location, verbose_name="Локация",
                                        related_name="monsters_in_location")
-    slug = models.SlugField(max_length=200, db_index=True, unique=True)
+    slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.name
@@ -76,18 +78,20 @@ class Monster(models.Model):
 
 
 class Item(models.Model):
-    name = models.CharField(verbose_name="Предмет", max_length=150)
-    description = models.TextField("Описание", null=True, blank=True)
-    weight = models.IntegerField("Вес", default=0)
+    name = models.CharField(verbose_name="Предмет: ", max_length=150)
+    description = models.TextField("Описание: ", null=True, blank=True)
+    weight = models.IntegerField("Вес:", default=0)
     category = models.ForeignKey(Category,
                                  verbose_name="Категория",
                                  on_delete=models.CASCADE)
     monster = models.ManyToManyField(Monster,
-                                     verbose_name="Монстр",
+                                     verbose_name="Выпадает с: ",
                                      related_name="monster_item")
-    url = models.SlugField(max_length=250, unique=True)
-    item_img = models.ImageField(upload_to='media/items/', default=DEFAULT_IMG)
-    slug = models.SlugField(max_length=130, unique=True)
+    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    item_img = models.ImageField("Изображение",
+                                 upload_to='media/items/',
+                                 default=DEFAULT_IMG)
+    slug = models.SlugField("Слаг", max_length=130, unique=True)
 
     def __str__(self):
         return self.name
