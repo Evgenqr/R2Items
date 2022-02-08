@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
-
 from django.urls import reverse
+
 
 DEFAULT_IMG = 'media/img_default.jpg'
 
@@ -56,7 +56,8 @@ class Monster(models.Model):
     #                                 null=True,
     #                                 blank=True)
     url = models.SlugField("Ссылка", max_length=250, unique=True)
-    locations = models.ManyToManyField(Location, verbose_name="Локация",
+    locations = models.ManyToManyField(Location,
+                                       verbose_name="Локация",
                                        related_name="monsters_in_location")
     slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
@@ -104,3 +105,24 @@ class Item(models.Model):
     class Meta:
         verbose_name = "Предмет"
         verbose_name_plural = "Предметы"
+
+
+class Reviews(models.Model):
+    email = models.EmailField()
+    name = models.CharField("Имя", max_length=100)
+    text = models.TextField("Сообщение", max_length=5000)
+    parent = models.ForeignKey('self',
+                               verbose_name="Родитель",
+                               on_delete=models.SET_NULL,
+                               blank=True,
+                               null=True)
+    item = models.ForeignKey(Item,
+                             verbose_name="Итем",
+                             on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.name} - {self.item}"
+
+    class Meta:
+        verbose_name = "Комментарий"
+        verbose_name_plural = "Комментарии"

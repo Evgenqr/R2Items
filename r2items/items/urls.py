@@ -3,11 +3,13 @@ from . import views
 from django.conf.urls.static import static
 from django.conf import settings
 
+app_name = 'item'
+
 urlpatterns = [
-    path('', views.LocationsView.as_view(), name="locations"),
+    path('', views.LocationsView.as_view(), name="location"),
     path('signup/', views.signupuser, name='signupuser'),
-    path('logout', views.logoutuser,  name="logoutuser"),
-    path('login', views.loginuser,  name="loginuser"),
+    path('logout/', views.logoutuser,  name="logoutuser"),
+    path('login/', views.loginuser,  name="loginuser"),
     path('create/', views.createlocation, name='createlocation'),
     path('createitem/', views.createitem, name='createitem'),
     path('createmonster/', views.createmonster, name='createmonster'),
@@ -17,6 +19,7 @@ urlpatterns = [
     path('location/<str:slug>/',
          views.get_local,
          name='locations'),
+   
 ]
 
 

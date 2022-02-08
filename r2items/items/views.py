@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import LocationForm, ItemForm, MonsterForm
+from .forms import LocationForm, ItemForm, MonsterForm, ReviewForm
 
 
 class LocationsView(views.View):
@@ -48,10 +48,10 @@ def signupuser(request):
             try:
                 user = User.objects.create_user(
                     request.POST['username'],
-                    password=request.POSt['password1'])
+                    password=request.POST['password1'])
                 user.save()
                 login(request, user)
-                return redirect('locations')
+                return redirect('/')
             except IntegrityError:
                 return render(
                     request, 'items/signupuser.html', {
@@ -83,7 +83,7 @@ def loginuser(request):
                 })
         else:
             login(request, user)
-            return redirect('locations')
+            return redirect('/')
 
 
 @login_required
@@ -122,9 +122,7 @@ def createitem(request):
         return render(request, 'items/createitem.html', {'form': ItemForm()})
     else:
         try:
-            form = ItemForm(request.POST,
-                            request.FILES,
-                            instance=request.user)
+            form = ItemForm(request.POST, request.FILES, instance=request.user)
             newitem = form.save(commit=False)
             newitem.user = request.user
             newitem.save()
@@ -156,6 +154,14 @@ def createmonster(request):
                 'error': 'Bad data passed in'
             })
 
-@login_required
-def viewitem(requset):
-    pass
+
+class AddReview(views.View):
+    """Отзывы"""
+    def post(self, request, pk):
+        form = ReviewForm(request.POST)
+        item = Item.objects.get(id=pk)
+        if form.is_valid():
+            form = form.save(commit=False)
+            form.item = item
+            form.save()
+        return redirect(item.get_absolute_url())

@@ -6,21 +6,21 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-            {% if user.is.authenticated %}
-                {{ user.username }}
+            {% if user.is.authenticated %}cccc
+                {{ user.name }}
                 <li class="nav-item">
                     <a class="nav-link active" aria-current="page" href="/create/">Главная</a>
                 </li>
                 <form action="{% url 'logoutuser' %}" method="POST">
                     {% csrf_token %}
-                    <button type="submit"> Выйти </button>
+                   <button type="submit"> Выйти </button>
                 </form>
           {% else %} 
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'loginuser' %}"> Авторизация</a>
+                <a class="nav-link" href="/login/"> Авторизация</a>
             </li>
             <li class="nav-item"></li>
-                <a class="nav-link" href="{% url 'signupuser' %}"> Регистрация</a>
+                <a class="nav-link" href="/signup/"> Регистрация</a>
             </li>
             {% endif %}
         </ul>
