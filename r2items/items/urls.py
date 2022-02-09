@@ -6,7 +6,7 @@ from django.conf import settings
 app_name = 'item'
 
 urlpatterns = [
-    path('', views.LocationsView.as_view(), name="location"),
+    path('', views.LocationsView.as_view(), name="locations"),
     path('signup/', views.signupuser, name='signupuser'),
     path('logout/', views.logoutuser,  name="logoutuser"),
     path('login/', views.loginuser,  name="loginuser"),

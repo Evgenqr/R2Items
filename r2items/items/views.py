@@ -6,7 +6,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import LocationForm, ItemForm, MonsterForm, ReviewForm
+from .forms import LocationForm, ItemForm, MonsterForm#, ReviewForm
 
 
 class LocationsView(views.View):
@@ -155,13 +155,13 @@ def createmonster(request):
             })
 
 
-class AddReview(views.View):
-    """Отзывы"""
-    def post(self, request, pk):
-        form = ReviewForm(request.POST)
-        item = Item.objects.get(id=pk)
-        if form.is_valid():
-            form = form.save(commit=False)
-            form.item = item
-            form.save()
-        return redirect(item.get_absolute_url())
+# class AddReview(views.View):
+#     """Отзывы"""
+#     def post(self, request, pk):
+#         form = ReviewForm(request.POST)
+#         item = Item.objects.get(id=pk)
+#         if form.is_valid():
+#             form = form.save(commit=False)
+#             form.item = item
+#             form.save()
+#         return redirect(item.get_absolute_url())

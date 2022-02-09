@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Location, Monster, Category, Item, Reviews
+from .models import Location, Monster, Category, Item#, Reviews
 
    
 class LocationAdmin(admin.ModelAdmin):
@@ -32,4 +32,4 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Monster, MonsterAdmin)
 admin.site.register(Category)
 admin.site.register(Item, ItemAdmin)
-admin.site.register(Reviews)
+# admin.site.register(Reviews)
