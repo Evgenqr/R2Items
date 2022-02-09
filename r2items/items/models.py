@@ -1,4 +1,3 @@
-from pyexpat import model
 from django.db import models
 from django.utils.text import slugify
 from django.urls import reverse
@@ -80,9 +79,15 @@ class Monster(models.Model):
 
 
 class Item(models.Model):
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор", blank=True, null=True)
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               verbose_name="Автор",
+                               blank=True,
+                               null=True)
     name = models.CharField(verbose_name="Предмет: ", max_length=150)
-    description =  models.TextField(verbose_name="Описание", null=True, blank=True)
+    description = models.TextField(verbose_name="Описание",
+                                   null=True,
+                                   blank=True)
     weight = models.IntegerField("Вес:", default=0)
     category = models.ForeignKey(Category,
                                  verbose_name="Категория",
@@ -108,23 +113,25 @@ class Item(models.Model):
         verbose_name = "Предмет"
         verbose_name_plural = "Предметы"
 
+
 class Comments(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, verbose_name="Итем", blank=True, null=True,
-                             related_name="comments_items")
-    # monster = models.ForeignKey(Monster, on_delete=models.CASCADE, verbose_name="Итем", blank=True, null=True,
-    #                          related_name="comments_monsters")
-    # location = models.ForeignKey(Location, on_delete=models.CASCADE, verbose_name="Итем", blank=True, null=True,
-    #                          related_name="comments_locatins")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор", blank=True, null=True,
-                             )
+    monster = models.ForeignKey(Monster,
+                                on_delete=models.CASCADE,
+                                verbose_name="Монстр",
+                                blank=True,
+                                null=True,
+                                related_name="comments_monsters")
+    author = models.ForeignKey(User,
+                               on_delete=models.CASCADE,
+                               verbose_name="Автор",
+                               blank=True,
+                               null=True)
     create_date = models.DateTimeField(auto_now=True)
     text = models.TextField(verbose_name="текст комментария", max_length=3000)
-    status = models.BooleanField(verbose_name="Видимость комментария", default=False) 
 
     def __str__(self):
-        return f"{self.author} - {self.item}"
+        return f"{self.author} - {self.monster} - {self.text}"
 
     class Meta:
         verbose_name = "Комментарий"
         verbose_name_plural = "Комментарии"
-

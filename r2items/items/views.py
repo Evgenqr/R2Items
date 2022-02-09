@@ -1,15 +1,17 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import views
-from .models import Item, Location, Monster
+from .models import Item, Location, Monster, Comments
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import LocationForm, ItemForm, MonsterForm#, ReviewForm
+from .forms import LocationForm, ItemForm, MonsterForm, CommentForm
+from django.http import HttpResponseRedirect
 
 
 class LocationsView(views.View):
+
     def get(self, request, *args, **kwargs):
         locations = Location.objects.all()
         monsters = Monster.objects.all()
@@ -155,13 +157,38 @@ def createmonster(request):
             })
 
 
-# class AddReview(views.View):
-#     """Отзывы"""
-#     def post(self, request, pk):
-#         form = ReviewForm(request.POST)
-#         item = Item.objects.get(id=pk)
-#         if form.is_valid():
-#             form = form.save(commit=False)
-#             form.item = item
-#             form.save()
-#         return redirect(item.get_absolute_url())
+def get_comment(request, slug):
+    slug = Monster.objects.get(slug=slug)
+    if slug:
+        items = Item.objects.filter(monster=slug)
+        if request.method == 'POST':
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(request.path_info)
+
+        else:
+            form = CommentForm()
+            names = Comments.objects.all()
+    else:
+        items = Item.objects.all()
+    monsters = Monster.objects.all()
+    comments = Comments.objects.all()
+    return render(request, 'items/name.html', {
+        'form': form,
+        'names': names,
+        'monsters': monsters,
+        'items': items,
+        'comments': comments
+    })
+
+
+# def get_items(request, slug):
+#     slug = Monster.objects.get(slug=slug)
+#     if slug:
+#         items = Item.objects.filter(monster=slug)
+#     else:
+#         items = Item.objects.all()
+#     monsters = Monster.objects.all()
+#     context = {'items': items, 'monsters': monsters}
+#     return render(request, 'items/monsters.html', context)
