@@ -1,19 +1,17 @@
 from django.contrib import admin
-from .models import Location, Monster, Category, Item, Comments
+from .models import Location, Monster, Category, Item, Reviews
 
    
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ['title', 'slug']
-    prepopulated_fields = {'slug': ('title', ), 'url': ('title', )}
+    list_display = ['title']
+    prepopulated_fields = {'url': ('title', )}
     list_filter = ['title']
-    list_editable = ['slug']
 
 
 class MonsterAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
-    prepopulated_fields = {'slug': ('name', ), 'url': ('name', )}
+    list_display = ['name', ]
+    prepopulated_fields = {'url': ('name', )}
     list_filter = ['name']
-    list_editable = ['slug']
 
 
 class ItemAdmin(admin.ModelAdmin):
@@ -21,16 +19,15 @@ class ItemAdmin(admin.ModelAdmin):
         'name',
         'category',
         'url',
-        'slug'
     ]
-    prepopulated_fields = {'slug': ('name', ), 'url': ('name', )}
+    prepopulated_fields = {'url': ('name', )}
     list_filter = ['name', 'category', 'monster']
-    list_editable = ['category', 'url', 'slug']
+    list_editable = ['category', 'url']
 
 
-class CommentAdmin(admin.ModelAdmin):
+class ReviewsAdmin(admin.ModelAdmin):
     list_display = [
-        'author',
+        'name',
         'monster',
         'text'
     ]
@@ -40,4 +37,4 @@ admin.site.register(Location, LocationAdmin)
 admin.site.register(Monster, MonsterAdmin)
 admin.site.register(Category)
 admin.site.register(Item, ItemAdmin)
-admin.site.register(Comments, CommentAdmin)
+admin.site.register(Reviews, ReviewsAdmin)

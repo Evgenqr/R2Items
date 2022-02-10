@@ -28,22 +28,20 @@ class Location(models.Model):
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)
     url = models.SlugField("Ссылка", max_length=250, unique=True)
-    slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super(Location, self).save(*args, **kwargs)
+     
+    def get_absolute_url(self):
+        return reverse("location_list", kwargs={"slug": self.url})
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.title)
+    #     super(Location, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Локация"
         verbose_name_plural = "Локации"
-
-    def get_absolute_url(self):
-        return reverse('monsters', args=[self.slug])
 
 
 class Monster(models.Model):
@@ -52,22 +50,23 @@ class Monster(models.Model):
     monster_img = models.FileField("Изображение",
                                    upload_to="media/monsters",
                                    default=DEFAULT_IMG)
-    # models.ImageField(upload_to=upload_function,
-    #                                 null=True,
-    #                                 blank=True)
     url = models.SlugField("Ссылка", max_length=250, unique=True)
     locations = models.ManyToManyField(Location,
                                        verbose_name="Локация",
                                        related_name="monsters_in_location")
-    slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
+
+    # slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super(Monster, self).save(*args, **kwargs)
+    def get_absolute_url(self):
+        return reverse("monster_list", kwargs={"slug": self.url})
+
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.name)
+    #     super(Monster, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Монстр"
@@ -99,39 +98,64 @@ class Item(models.Model):
     item_img = models.ImageField("Изображение",
                                  upload_to='media/items/',
                                  default=DEFAULT_IMG)
-    slug = models.SlugField("Слаг", max_length=130, unique=True)
+
+    # slug = models.SlugField("Слаг", max_length=130, unique=True)
 
     def __str__(self):
         return self.name
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super(Item, self).save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.slug:
+    #         self.slug = slugify(self.name)
+    #     super(Item, self).save(*args, **kwargs)
+    def get_absolute_url(self):
+        return reverse("item_list", kwargs={"slug": self.url})
 
     class Meta:
         verbose_name = "Предмет"
         verbose_name_plural = "Предметы"
 
 
-class Comments(models.Model):
-    monster = models.ForeignKey(Monster,
-                                on_delete=models.CASCADE,
-                                verbose_name="Монстр",
-                                blank=True,
-                                null=True,
-                                related_name="comments_monsters")
-    author = models.ForeignKey(User,
-                               on_delete=models.CASCADE,
-                               verbose_name="Автор",
+class Reviews(models.Model):
+    """Отзывы"""
+    email = models.EmailField()
+    name = models.CharField("Имя", max_length=100)
+    text = models.TextField("Сообщение", max_length=5000)
+    parent = models.ForeignKey('self',
+                               verbose_name="Родитель",
+                               on_delete=models.SET_NULL,
                                blank=True,
                                null=True)
-    create_date = models.DateTimeField(auto_now=True)
-    text = models.TextField(verbose_name="текст комментария", max_length=3000)
+    monster = models.ForeignKey(Monster,
+                                verbose_name="Монстр",
+                                on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"{self.author} - {self.monster} - {self.text}"
+        return f"{self.name} - {self.monster}"
 
     class Meta:
-        verbose_name = "Комментарий"
-        verbose_name_plural = "Комментарии"
+        verbose_name = "Отзыв"
+        verbose_name_plural = "Отзывы"
+
+
+# class Comments(models.Model):
+#     monster = models.ForeignKey(Monster,
+#                                 on_delete=models.CASCADE,
+#                                 verbose_name="Монстр",
+#                                 blank=True,
+#                                 null=True,
+#                                 related_name="comments_monsters")
+#     author = models.ForeignKey(User,
+#                                on_delete=models.CASCADE,
+#                                verbose_name="Автор",
+#                                blank=True,
+#                                null=True)
+#     create_date = models.DateTimeField(auto_now=True)
+#     text = models.TextField(verbose_name="текст комментария", max_length=3000)
+
+#     def __str__(self):
+#         return f"{self.author} - {self.monster} - {self.text}"
+
+#     class Meta:
+#         verbose_name = "Комментарий"
+#         verbose_name_plural = "Комментарии"

@@ -1,11 +1,11 @@
 from django.forms import ModelForm
-from .models import Item, Monster, Location, Category, Comments
+from .models import Item, Monster, Location, Category, Reviews
 
 
 class LocationForm(ModelForm):
     class Meta:
         model = Location
-        fields = ('title', 'local_img', 'slug', 'url')
+        fields = ('title', 'local_img', 'url')
 
 
 class ItemForm(ModelForm):
@@ -13,14 +13,14 @@ class ItemForm(ModelForm):
         model = Item
         fields = [
             'name', 'description', 'weight', 'category', 'monster', 'item_img',
-            'slug', 'url'
+            'url'
         ]
 
 
 class MonsterForm(ModelForm):
     class Meta:
         model = Monster
-        fields = ('name', 'description', 'monster_img', 'locations', 'slug',
+        fields = ('name', 'description', 'monster_img', 'locations', 
                   'url')
 
 
@@ -32,5 +32,5 @@ class CategoryForm(ModelForm):
 class CommentForm(ModelForm):
     """Форма комментариев"""
     class Meta:
-        model = Comments
+        model = Reviews
         fields = ("text", )

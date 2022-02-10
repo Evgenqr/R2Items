@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import views
-from .models import Item, Location, Monster, Comments
+from .models import Item, Location, Monster, Reviews
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
@@ -8,37 +8,69 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import LocationForm, ItemForm, MonsterForm, CommentForm
 from django.http import HttpResponseRedirect
+from django.views.generic import ListView, DetailView
 
 
-class LocationsView(views.View):
-
-    def get(self, request, *args, **kwargs):
-        locations = Location.objects.all()
-        monsters = Monster.objects.all()
-        context = {'locations': locations, 'monsters': monsters}
-        return render(request, 'items/index.html', context)
+class LocationsView(ListView):
+    model = Location
+    queryset = Location.objects.all()
 
 
-def get_local(request, slug):
-    slug = Location.objects.get(slug=slug)
-    if slug:
-        monsters = Monster.objects.filter(locations=slug)
-    else:
-        monsters = Monster.objects.all()
-    locations = Location.objects.all()
-    context = {'monsters': monsters, 'locations': locations}
-    return render(request, 'items/locations.html', context)
+class LocationsDetailView(DetailView):
+    model = Location
+    slug_field = "url"
 
 
-def get_items(request, slug):
-    slug = Monster.objects.get(slug=slug)
-    if slug:
-        items = Item.objects.filter(monster=slug)
-    else:
-        items = Item.objects.all()
-    monsters = Monster.objects.all()
-    context = {'items': items, 'monsters': monsters}
-    return render(request, 'items/monsters.html', context)
+class MonsterView(ListView):
+    model = Monster
+    queryset = Monster.objects.all()
+
+
+class MonsterDetailView(DetailView):
+    model = Monster
+    slug_field = "url"
+
+
+class ItemView(ListView):
+    model = Item
+    queryset = Item.objects.all()
+    print('!!!!!', queryset)
+
+
+class ItemDetailView(DetailView):
+    model = Item
+    slug_field = "url"
+
+
+# class LocationsssView(views.View):
+
+#     def get(self, request, *args, **kwargs):
+#         locations = Location.objects.all()
+#         monsters = Monster.objects.all()
+#         context = {'locations': locations, 'monsters': monsters}
+#         return render(request, 'items/index.html', context)
+
+
+# def get_local(request):
+#     slug = Location.objects.all()
+#     if slug:
+#         monsters = Monster.objects.filter(locations=slug)
+#     else:
+#         monsters = Monster.objects.all()
+#     locations = Location.objects.all()
+#     context = {'monsters': monsters, 'locations': locations}
+#     return render(request, 'items/locations.html', context)
+
+
+# def get_items(request):
+#     slug = Monster.objects.all()
+#     if slug:
+#         items = Item.objects.filter(monster=slug)
+#     else:
+#         items = Item.objects.all()
+#     monsters = Monster.objects.all()
+#     context = {'items': items, 'monsters': monsters}
+#     return render(request, 'items/monsters.html', context)
 
 
 def signupuser(request):
@@ -157,8 +189,8 @@ def createmonster(request):
             })
 
 
-def get_comment(request, slug):
-    slug = Monster.objects.get(slug=slug)
+def get_comment(request):
+    slug = Monster.objects.all()
     if slug:
         items = Item.objects.filter(monster=slug)
         if request.method == 'POST':
@@ -169,11 +201,11 @@ def get_comment(request, slug):
 
         else:
             form = CommentForm()
-            names = Comments.objects.all()
+            names = Reviews.objects.all()
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
-    comments = Comments.objects.all()
+    comments = Reviews.objects.all()
     return render(request, 'items/name.html', {
         'form': form,
         'names': names,

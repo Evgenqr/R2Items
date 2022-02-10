@@ -1,10 +1,10 @@
 {% extends 'base.html' %} 
 {% load static %}
-ddd
-{% block content %}ddda
+
+{% block content %}
     <div class="col-md-12">
         <div class="row">
-            {% for item in items %} 
+            {% for item in item_list %} 
                 <div class="card col-md-4 p-0 mb-3 mt-3"> 
                     <div class="card-body text-center">
                         <img src="{{ item.item_img.url }}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> <br>
