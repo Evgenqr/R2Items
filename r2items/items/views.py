@@ -205,7 +205,11 @@ def get_comment(request):
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
+<<<<<<< HEAD
     comments = Reviews.objects.all()
+=======
+    comments = Comments.objects.filter(monster=slug)
+>>>>>>> 31b38b1a96e7d6379529f9ce7ef65b3742145e7b
     return render(request, 'items/name.html', {
         'form': form,
         'names': names,
