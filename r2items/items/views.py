@@ -173,7 +173,7 @@ def get_comment(request, slug):
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
-    comments = Comments.objects.all()
+    comments = Comments.objects.filter(monster=slug)
     return render(request, 'items/name.html', {
         'form': form,
         'names': names,
