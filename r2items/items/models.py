@@ -138,6 +138,29 @@ class Reviews(models.Model):
         verbose_name_plural = "Отзывы"
 
 
+
+class Comment(models.Model):
+    post = models.ForeignKey(
+        Monster,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments'
+    )
+    text = models.TextField()
+    created = models.DateTimeField('date published', auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created']
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self):
+        return self.text[:15]
+
 # class Comments(models.Model):
 #     monster = models.ForeignKey(Monster,
 #                                 on_delete=models.CASCADE,

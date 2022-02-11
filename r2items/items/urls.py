@@ -3,12 +3,16 @@ from . import views
 from django.conf.urls.static import static
 from django.conf import settings
 
+app_name = 'item'
 
 urlpatterns = [
-    path('', views.LocationsView.as_view(), name="location_list"),  # location_list
-    path("location/<slug:slug>/", views.MonsterView.as_view(), name="location_list"),  # monster_list ???
-    path("monster/<slug:slug>/", views.ItemView.as_view(), name="item_list"), # monster_detail
-    path("item/<slug:slug>/", views.ItemView.as_view(), name="item_list"),
+    path('', views.LocationsView.as_view(), name="locations"),
+    path('location/<str:slug>/',
+        views.location_detail,
+        name='location_detail'),
+    path('monster/<str:slug>/',
+        views.monster_detail,
+        name='monster_detail'),
     path('signup/', views.signupuser, name='signupuser'),
     path('logout/', views.logoutuser,  name="logoutuser"),
     path('login/', views.loginuser,  name="loginuser"),
@@ -16,17 +20,10 @@ urlpatterns = [
     path('createitem/', views.createitem, name='createitem'),
     path('createmonster/', views.createmonster, name='createmonster'),
 
-    
-
-    # path('monsters/<str:slug>/',
-    #      views.get_items,
-    #      name='monsters'),
-    # path('monsters/<str:slug>/',
+    # path('monsters/<str:url>/',
     #      views.get_comment,
     #      name='names'),
-    # path('location/<int:pk>/',
-    #      views.get_local,
-    #      name='locations'),
+
    
 ]
 

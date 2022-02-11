@@ -11,66 +11,103 @@ from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 
 
-class LocationsView(ListView):
-    model = Location
-    queryset = Location.objects.all()
+# class LocationsView(ListView):
+#     model = Location
+#     queryset = Location.objects.all()
 
 
-class LocationsDetailView(DetailView):
-    model = Location
-    slug_field = "url"
+# class LocationDetailView(DetailView):
+#     model = Location
+#     template_name = 'items/location_detail.html'
+#     slug_url_kwargs = 'slug'
+#     context_object_name = 'location_detail'
+#     slug_field = "url"
 
 
-class MonsterView(ListView):
-    model = Monster
-    queryset = Monster.objects.all()
 
 
-class MonsterDetailView(DetailView):
-    model = Monster
-    slug_field = "url"
+class LocationsView(views.View):
+
+    def get(self, request, *args, **kwargs):
+        locations = Location.objects.all()
+        monsters = Monster.objects.all()
+        context = {'locations': locations, 'monsters': monsters}
+        return render(request, 'items/index.html', context)
 
 
-class ItemView(ListView):
-    model = Item
-    queryset = Item.objects.all()
-    print('!!!!!', queryset)
+def location_detail(request, slug):
+    slug = Location.objects.get(url=slug)
+    if slug:
+        monsters = Monster.objects.filter(locations=slug)
+    else:
+        monsters = Monster.objects.all()
+    locations = Location.objects.all()
+    context = {'monsters': monsters, 'location_detail': locations}
+    return render(request, 'items/location_detail.html', context)
 
 
-class ItemDetailView(DetailView):
-    model = Item
-    slug_field = "url"
+
+def monster_detail(request, slug):
+    slug = Monster.objects.get(url=slug)
+    print('!!!!!', slug)
+    if slug:
+        items = Item.objects.filter(monster=slug)
+    else:
+        items = Item.objects.all()
+    monsters = Monster.objects.all()
+    context = {'items': items, 'monsters': monsters}
+    return render(request, 'items/monster_detail.html', context)
 
 
-# class LocationsssView(views.View):
-
-#     def get(self, request, *args, **kwargs):
-#         locations = Location.objects.all()
-#         monsters = Monster.objects.all()
-#         context = {'locations': locations, 'monsters': monsters}
-#         return render(request, 'items/index.html', context)
 
 
-# def get_local(request):
-#     slug = Location.objects.all()
-#     if slug:
-#         monsters = Monster.objects.filter(locations=slug)
-#     else:
-#         monsters = Monster.objects.all()
-#     locations = Location.objects.all()
-#     context = {'monsters': monsters, 'locations': locations}
-#     return render(request, 'items/locations.html', context)
+def get_comment(request):
+    slug = Monster.objects.all()
+    if slug:
+        items = Item.objects.filter(monster=slug)
+        if request.method == 'POST':
+            form = CommentForm(request.POST)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect(request.path_info)
+
+        else:
+            form = CommentForm()
+            names = Reviews.objects.all()
+    else:
+        items = Item.objects.all()
+    monsters = Monster.objects.all()
+    comments = Reviews.objects.all()
+    return render(request, 'items/name.html', {
+        'form': form,
+        'names': names,
+        'monsters': monsters,
+        'items': items,
+        'comments': comments
+    })
 
 
-# def get_items(request):
-#     slug = Monster.objects.all()
-#     if slug:
-#         items = Item.objects.filter(monster=slug)
-#     else:
-#         items = Item.objects.all()
-#     monsters = Monster.objects.all()
-#     context = {'items': items, 'monsters': monsters}
-#     return render(request, 'items/monsters.html', context)
+# class MonsterView(ListView):
+#     model = Monster
+#     queryset = Monster.objects.all()
+
+
+# class MonsterDetailView(DetailView):
+#     model = Monster
+#     slug_field = "url"
+
+
+# class ItemView(ListView):
+#     model = Item
+#     queryset = Item.objects.all()
+#     print('!!!!!', queryset)
+
+
+# class ItemDetailView(DetailView):
+#     model = Item
+#     slug_field = "url"
+
+
 
 
 def signupuser(request):
@@ -205,11 +242,7 @@ def get_comment(request):
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
-<<<<<<< HEAD
     comments = Reviews.objects.all()
-=======
-    comments = Comments.objects.filter(monster=slug)
->>>>>>> 31b38b1a96e7d6379529f9ce7ef65b3742145e7b
     return render(request, 'items/name.html', {
         'form': form,
         'names': names,
@@ -217,6 +250,7 @@ def get_comment(request):
         'items': items,
         'comments': comments
     })
+
 
 
 # def get_items(request, slug):
