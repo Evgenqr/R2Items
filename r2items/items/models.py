@@ -83,7 +83,7 @@ class Item(models.Model):
                                verbose_name="Автор",
                                blank=True,
                                null=True)
-    name = models.CharField(verbose_name="Предмет: ", max_length=150)
+    name = models.CharField(verbose_name="Предмет", max_length=150)
     description = models.TextField(verbose_name="Описание",
                                    null=True,
                                    blank=True)

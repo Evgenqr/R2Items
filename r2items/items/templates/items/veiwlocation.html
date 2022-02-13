@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{{ error }}
+{{location.title}}
+<form method="POST" action="{% url 'viewlocation' location.url %}">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit">Save</button>
+</form>
+
+
+<form method="POST" action="{% url 'deletelocation' location.url %}">
+    {% csrf_token %}
+<button type="submit">Delete</button>
+</form>
+
+{% endblock %}
+
+
+

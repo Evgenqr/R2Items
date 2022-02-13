@@ -1,5 +1,83 @@
 
 
+<div class="dropdown">
+    <button id="dLabel" type="button" data-toggle="dropdown" aria-expanded="false">
+      Dropdown trigger
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dLabel">
+      ...
+    </ul>
+  </div>
+  
+<ul class="nav nav-pills">
+    <li class="nav-item">
+      <a class="nav-link active" aria-current="page" href="#">Active</a>
+    </li>
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-expanded="false">Dropdown</a>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Another action</a></li>
+        <li><a class="dropdown-item" href="#">Something else here</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Separated link</a></li>
+      </ul>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Link</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+    </li>
+  </ul>
+
+
+<nav class="navbar  nav-tabs navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/admin">R2 Items</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse dropdown" id="navbarSupportedContent">
+        <div class="dropdown">
+
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            {% if user.is.authenticated %}
+               
+                <li class="nav-item"> 
+                    <a class="nav-link active" aria-current="page" href="{% url 'createlocation' %}">Главная</a>
+                </li>
+                <form action="{% url 'logoutuser' %}" method="POST">
+                    {% csrf_token %}
+                   <button type="submit"> Выйти </button>
+                </form>
+          {% else %} 
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'loginuser' %}"> Авторизация</a>
+            </li>
+            <li class="nav-item"></li>
+                <a class="nav-link" href="{% url 'signupuser' %}"> Регистрация</a>
+            </li>
+            <li class="nav-item dropdown">
+                <div class="dropdown"></div>
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="" role="button" aria-expanded="false">{{ user.username }}</a>
+                <ul class="dropdown-menu" aria-labelledby="dLabel">
+                  <li><a class="dropdown-item" href="{% url 'createlocation' %}">Action</a></li>
+                  <li><a class="dropdown-item" href="{% url 'signupuser' %}">Another action</a></li>
+                  <li><a class="dropdown-item" href="{% url 'loginuser' %}">Something else here</a></li>
+                  <!-- <li><hr class="dropdown-divider"></li> -->
+                  <li><a class="dropdown-item" href="{% url 'createlocation' %}">Separated link</a></li>
+                </ul>
+              </li>
+            
+        </ul>
+    </div>
+    {% endif %}
+      </div>
+    </div>
+   
+  </nav>
+
 
 
 

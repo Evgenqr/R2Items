@@ -11,23 +11,7 @@ from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 
 
-# class LocationsView(ListView):
-#     model = Location
-#     queryset = Location.objects.all()
-
-
-# class LocationDetailView(DetailView):
-#     model = Location
-#     template_name = 'items/location_detail.html'
-#     slug_url_kwargs = 'slug'
-#     context_object_name = 'location_detail'
-#     slug_field = "url"
-
-
-
-
 class LocationsView(views.View):
-
     def get(self, request, *args, **kwargs):
         locations = Location.objects.all()
         monsters = Monster.objects.all()
@@ -35,80 +19,58 @@ class LocationsView(views.View):
         return render(request, 'items/index.html', context)
 
 
+@login_required
 def location_detail(request, slug):
     slug = Location.objects.get(url=slug)
+    locations = Location.objects.all()
     if slug:
         monsters = Monster.objects.filter(locations=slug)
     else:
         monsters = Monster.objects.all()
-    locations = Location.objects.all()
-    context = {'monsters': monsters, 'location_detail': locations}
+    context = {'monsters': monsters, 'locations': locations}
     return render(request, 'items/location_detail.html', context)
 
 
-
+@login_required
 def monster_detail(request, slug):
     slug = Monster.objects.get(url=slug)
+    locations = Location.objects.all()
     print('!!!!!', slug)
     if slug:
         items = Item.objects.filter(monster=slug)
     else:
         items = Item.objects.all()
     monsters = Monster.objects.all()
-    context = {'items': items, 'monsters': monsters}
+    context = {'items': items, 'monsters': monsters, 'locations': locations}
     return render(request, 'items/monster_detail.html', context)
 
 
 
+# @login_required
+# def get_comment(request):
+#     slug = Monster.objects.all()
+#     if slug:
+#         items = Item.objects.filter(monster=slug)
+#         if request.method == 'POST':
+#             form = CommentForm(request.POST)
+#             if form.is_valid():
+#                 form.save()
+#                 return HttpResponseRedirect(request.path_info)
 
-def get_comment(request):
-    slug = Monster.objects.all()
-    if slug:
-        items = Item.objects.filter(monster=slug)
-        if request.method == 'POST':
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return HttpResponseRedirect(request.path_info)
-
-        else:
-            form = CommentForm()
-            names = Reviews.objects.all()
-    else:
-        items = Item.objects.all()
-    monsters = Monster.objects.all()
-    comments = Reviews.objects.all()
-    return render(request, 'items/name.html', {
-        'form': form,
-        'names': names,
-        'monsters': monsters,
-        'items': items,
-        'comments': comments
-    })
-
-
-# class MonsterView(ListView):
-#     model = Monster
-#     queryset = Monster.objects.all()
-
-
-# class MonsterDetailView(DetailView):
-#     model = Monster
-#     slug_field = "url"
-
-
-# class ItemView(ListView):
-#     model = Item
-#     queryset = Item.objects.all()
-#     print('!!!!!', queryset)
-
-
-# class ItemDetailView(DetailView):
-#     model = Item
-#     slug_field = "url"
-
-
-
+#         else:
+#             form = CommentForm()
+#             names = Reviews.objects.all()
+#     else:
+#         items = Item.objects.all()
+#     monsters = Monster.objects.all()
+#     comments = Reviews.objects.all()
+#     return render(request, 'items/name.html', {
+#         'form': form,
+#         'names': names,
+#         'monsters': monsters,
+#         'items': items,
+#         'comments': comments
+#     })
 
 def signupuser(request):
     if request.method == 'GET':
@@ -161,30 +123,57 @@ def loginuser(request):
 def logoutuser(request):
     if request.method == 'POST':
         logout(request)
-        return redirect('locations')
+        return redirect('/')
 
 
 @login_required
 def createlocation(request):
+    print('11??????????22')
     if request.method == 'GET':
+        print('??????????')
         return render(request, 'items/createlocation.html',
                       {'form': LocationForm()})
     else:
         try:
             form = LocationForm(request.POST,
-                                request.FILES,
-                                instance=request.user)
+                                request.FILES)
             newlocaltion = form.save(commit=False)
+            print('!!!', newlocaltion)
             newlocaltion.user = request.user
+            print('1111', newlocaltion)
             newlocaltion.save()
-            print('fff ', form)
-            print('newlocaltion ', newlocaltion)
-            return redirect('locations')
+            return redirect('home')
         except ValueError:
             return render(request, 'items/createlocation.html', {
                 'form': LocationForm(),
                 'error': 'Bad data passed in'
             })
+
+
+def viewlocation(request, slug):
+    location = get_object_or_404(Location, url=slug)
+    if request.method == 'GET':
+        form = LocationForm(instance=location)
+        return render(request, 'items/veiwlocation.html', {'location': location, 'form': form})
+    else:
+        try:
+            form = LocationForm(request.POST, instance=location)
+            form.save()
+            return redirect('home')
+        except ValueError:
+            return render(request, 'items/veiwlocation.html', {
+                'todo': location,
+                'form': LocationForm(),
+                'error': 'Bad info'
+            })
+
+
+@login_required
+def deletelocation(request, slug):
+    location = get_object_or_404(Location, url=slug)
+    if request.method == 'POST':
+        location.delete()
+        return redirect('home')
 
 
 @login_required
@@ -193,11 +182,11 @@ def createitem(request):
         return render(request, 'items/createitem.html', {'form': ItemForm()})
     else:
         try:
-            form = ItemForm(request.POST, request.FILES, instance=request.user)
+            form = ItemForm(request.POST, request.FILES)
             newitem = form.save(commit=False)
             newitem.user = request.user
             newitem.save()
-            return redirect('locations')
+            return redirect('home')
         except ValueError:
             return render(request, 'items/createitem.html', {
                 'form': ItemForm(),
@@ -212,13 +201,11 @@ def createmonster(request):
                       {'form': MonsterForm()})
     else:
         try:
-            form = MonsterForm(request.POST,
-                               request.FILES,
-                               instance=request.user)
+            form = MonsterForm(request.POST, request.FILES)
             newmonster = form.save(commit=False)
             newmonster.user = request.user
             newmonster.save()
-            return redirect('locations')
+            return redirect('home')
         except ValueError:
             return render(request, 'items/createmonster.html', {
                 'form': MonsterForm(),
