@@ -1,18 +1,20 @@
 {% extends 'base.html' %}
 {% load static %}
+{% block title %} {{ monster.name }}
+{%  endblock title  %}
 {% block content %}
 {{ error }}
-{{location.title}}
+{{ location.title }}
 <form method="POST" action="{% url 'viewlocation' location.url %}">
     {% csrf_token %}
     {{form.as_p}}
-    <button type="submit">Save</button>
+    <button type="submit" class="btn btn-success">Сохранить</button>
 </form>
 
-
+<p>
 <form method="POST" action="{% url 'deletelocation' location.url %}">
     {% csrf_token %}
-<button type="submit">Delete</button>
+<button type="submit"  class="btn btn-danger">Удалить</button>
 </form>
 
 {% endblock %}

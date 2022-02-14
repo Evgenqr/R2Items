@@ -1,5 +1,6 @@
 {% extends 'base.html' %} 
 {% load static %}
+{% block title %} Location {% endblock title %}
 
 {% block content %}
 <a href="view/" class="text-decoration-none"> Редактировать локацию </a>
@@ -10,6 +11,7 @@
                     <div class="card-body text-center">
                         <img src="{{ monster.monster_img.url }}" alt="image" class="img-fluid rounded-start" width="100px" height="150px"/>
                         {% for location in monster.locations.all %}
+                    
                             <h6 class="card-title">   
                                 <a href="/monster/{{ monster.url }}/" class="text-decoration-none"> {{ monster.name }} </a>
                             </h6>

@@ -16,6 +16,8 @@ urlpatterns = [
     path('createmonster/', views.createmonster, name='createmonster'),
     path('location/<str:slug>/view/', views.viewlocation, name='viewlocation'),
     path('location/<str:slug>/delete', views.deletelocation, name='deletelocation'),
+    path('monster/<str:slug>/view/', views.viewmonster, name='viewmonster'),
+    path('monster/<str:slug>/delete', views.deletemonster, name='deletemonster'),
     # path('monsters/<str:url>/',
     #      views.get_comment,
     #      name='names'),
