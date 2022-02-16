@@ -116,50 +116,50 @@ class Item(models.Model):
         verbose_name_plural = "Предметы"
 
 
-class Reviews(models.Model):
-    """Отзывы"""
-    email = models.EmailField()
-    name = models.CharField("Имя", max_length=100)
-    text = models.TextField("Сообщение", max_length=5000)
-    parent = models.ForeignKey('self',
-                               verbose_name="Родитель",
-                               on_delete=models.SET_NULL,
-                               blank=True,
-                               null=True)
-    monster = models.ForeignKey(Monster,
-                                verbose_name="Монстр",
-                                on_delete=models.CASCADE)
+# class Reviews(models.Model):
+#     """Отзывы"""
+#     email = models.EmailField()
+#     name = models.CharField("Имя", max_length=100)
+#     text = models.TextField("Сообщение", max_length=5000)
+#     parent = models.ForeignKey('self',
+#                                verbose_name="Родитель",
+#                                on_delete=models.SET_NULL,
+#                                blank=True,
+#                                null=True)
+#     monster = models.ForeignKey(Monster,
+#                                 verbose_name="Монстр",
+#                                 on_delete=models.CASCADE)
 
-    def __str__(self):
-        return f"{self.name} - {self.monster}"
+#     def __str__(self):
+#         return f"{self.name} - {self.monster}"
 
-    class Meta:
-        verbose_name = "Отзыв"
-        verbose_name_plural = "Отзывы"
+#     class Meta:
+#         verbose_name = "Отзыв"
+#         verbose_name_plural = "Отзывы"
 
 
 
-class Comment(models.Model):
-    post = models.ForeignKey(
-        Monster,
-        on_delete=models.CASCADE,
-        related_name='comments'
-    )
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='comments'
-    )
-    text = models.TextField()
-    created = models.DateTimeField('date published', auto_now_add=True)
+# class Comment(models.Model):
+#     post = models.ForeignKey(
+#         Monster,
+#         on_delete=models.CASCADE,
+#         related_name='comments'
+#     )
+#     author = models.ForeignKey(
+#         User,
+#         on_delete=models.CASCADE,
+#         related_name='comments'
+#     )
+#     text = models.TextField()
+#     created = models.DateTimeField('date published', auto_now_add=True)
 
-    class Meta:
-        ordering = ['-created']
-        verbose_name = 'Комментарий'
-        verbose_name_plural = 'Комментарии'
+#     class Meta:
+#         ordering = ['-created']
+#         verbose_name = 'Комментарий'
+#         verbose_name_plural = 'Комментарии'
 
-    def __str__(self):
-        return self.text[:15]
+#     def __str__(self):
+#         return self.text[:15]
 
 # class Comments(models.Model):
 #     monster = models.ForeignKey(Monster,

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Location, Monster, Category, Item, Reviews
+from .models import Location, Monster, Category, Item#, Reviews
 
    
 class LocationAdmin(admin.ModelAdmin):
@@ -25,16 +25,16 @@ class ItemAdmin(admin.ModelAdmin):
     list_editable = ['category', 'url']
 
 
-class ReviewsAdmin(admin.ModelAdmin):
-    list_display = [
-        'name',
-        'monster',
-        'text'
-    ]
+# class ReviewsAdmin(admin.ModelAdmin):
+#     list_display = [
+#         'name',
+#         'monster',
+#         'text'
+#     ]
 
 
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Monster, MonsterAdmin)
 admin.site.register(Category)
 admin.site.register(Item, ItemAdmin)
-admin.site.register(Reviews, ReviewsAdmin)
+# admin.site.register(Reviews, ReviewsAdmin)

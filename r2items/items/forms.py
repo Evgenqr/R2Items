@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from .models import Item, Monster, Location, Category, Reviews
+from .models import Item, Monster, Location, Category#, Reviews
 
 
 class LocationForm(ModelForm):
@@ -29,8 +29,8 @@ class CategoryForm(ModelForm):
     fields = ['name']
 
 
-class CommentForm(ModelForm):
-    """Форма комментариев"""
-    class Meta:
-        model = Reviews
-        fields = ("text", )
+# class CommentForm(ModelForm):
+#     """Форма комментариев"""
+#     class Meta:
+#         model = Reviews
+#         fields = ("text", )

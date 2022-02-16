@@ -1,14 +1,15 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import views
-from .models import Item, Location, Monster, Reviews
+from .models import Item, Location, Monster#, Reviews
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import LocationForm, ItemForm, MonsterForm, CommentForm
+from .forms import LocationForm, ItemForm, MonsterForm
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
+from django.views.generic.edit import FormView
 
 
 # ---- Location 
@@ -82,23 +83,74 @@ def location_detail(request, slug):
     return render(request, 'items/location_detail.html', context)
 
 
+class AddMonster(FormView):
+    template_name="items/createmonster.html"    
+    form_class = MonsterForm
+    success_url = '/'
+
+    def form_valid(self, slug):
+        slug = Location.objects.get(url=slug)
+        print('slug ', slug)
+        locations = Location.objects.all()
+        monsters = Monster.objects.filter(locations=slug)
+
+        instance = Monster.objects.create(locations=slug)
+
+        instance.locations.add(*monsters)
+
+        return redirect("/")
+    
+class Set_user(FormView):
+    template_name="items/createmonster.html"    
+    form_class = MonsterForm
+    success_url = '/'
+
+    def form_valid(self, form):
+        name = form.cleaned_data.get('name')
+        instance = Monster(name=name,locations=location)
+        instance.save()
+        instance.location.add(request.location.title)
+        instance.save()
+        return redirect("/")
+
 @login_required
-def createmonster(request):
-    if request.method == 'GET':
-        return render(request, 'items/createmonster.html',
-                      {'form': MonsterForm()})
+def createmonster(request, slug):
+    slug = Location.objects.get(url=slug)   
+    if request.method == 'POST':
+        form = MonsterForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_monster = form.save(commit=False)
+            new_monster.save()
+            new_monster.locations.add(slug)
     else:
-        try:
-            form = MonsterForm(request.POST, request.FILES)
-            newmonster = form.save(commit=False)
-            newmonster.user = request.user
-            newmonster.save()
-            return redirect('home')
-        except ValueError:
-            return render(request, 'items/createmonster.html', {
-                'form': MonsterForm(),
-                'error': 'Bad data passed in'
-            })
+        form = MonsterForm()
+    return render(request, 'items/createmonster.html', {'form': form})
+
+
+
+# @login_required
+# def createmonster(request):
+#     location = Location.objects.get(url=location)
+#     print('location ', location)
+#     # monster = location.
+#     if request.method == 'GET':
+#         return render(request, 'items/createmonster.html',
+#                       {'location': location, 'form': MonsterForm()})
+#     else:
+#         try:
+#             form = MonsterForm(request.POST, request.FILES)
+#             if form.is_valid:
+#                 newmonster = form.save(commit=False)
+#                 newmonster.user = request.user
+#                 newmonster.save()
+#                 return redirect('home')
+#         except ValueError:
+#             return render(request, 'items/createmonster.html', {
+#                 'location': location,
+#                 'monster': monster,
+#                 'form': MonsterForm(),
+#                 'error': 'Bad data passed in'
+#             })
 
 
 @login_required
@@ -144,21 +196,17 @@ def monster_detail(request, slug):
     return render(request, 'items/monster_detail.html', context)
 
 @login_required
-def createitem(request):
-    if request.method == 'GET':
-        return render(request, 'items/createitem.html', {'form': ItemForm()})
+def createitem(request, slug):
+    slug = Monster.objects.get(url=slug)   
+    if request.method == 'POST':
+        form = ItemForm(request.POST, request.FILES)
+        if form.is_valid():
+            new_item = form.save(commit=False)
+            new_item.save()
+            new_item.monster.add(slug)
     else:
-        try:
-            form = ItemForm(request.POST, request.FILES)
-            newitem = form.save(commit=False)
-            newitem.user = request.user
-            newitem.save()
-            return redirect('home')
-        except ValueError:
-            return render(request, 'items/createitem.html', {
-                'form': ItemForm(),
-                'error': 'Bad data passed in'
-            })
+        form = ItemForm()
+    return render(request, 'items/createitem.html', {'form': form})
             
 
 # ---- Item END
@@ -221,30 +269,30 @@ def logoutuser(request):
 
             
             
-def get_comment(request):
-    slug = Monster.objects.all()
-    if slug:
-        items = Item.objects.filter(monster=slug)
-        if request.method == 'POST':
-            form = CommentForm(request.POST)
-            if form.is_valid():
-                form.save()
-                return HttpResponseRedirect(request.path_info)
+# def get_comment(request):
+#     slug = Monster.objects.all()
+#     if slug:
+#         items = Item.objects.filter(monster=slug)
+#         if request.method == 'POST':
+#             form = CommentForm(request.POST)
+#             if form.is_valid():
+#                 form.save()
+#                 return HttpResponseRedirect(request.path_info)
 
-        else:
-            form = CommentForm()
-            names = Reviews.objects.all()
-    else:
-        items = Item.objects.all()
-    monsters = Monster.objects.all()
-    comments = Reviews.objects.all()
-    return render(request, 'items/name.html', {
-        'form': form,
-        'names': names,
-        'monsters': monsters,
-        'items': items,
-        'comments': comments
-    })
+#         else:
+#             form = CommentForm()
+#             names = Reviews.objects.all()
+#     else:
+#         items = Item.objects.all()
+#     monsters = Monster.objects.all()
+#     comments = Reviews.objects.all()
+#     return render(request, 'items/name.html', {
+#         'form': form,
+#         'names': names,
+#         'monsters': monsters,
+#         'items': items,
+#         'comments': comments
+#     })
 
 
 
