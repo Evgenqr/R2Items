@@ -28,6 +28,7 @@ class Location(models.Model):
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)
     url = models.SlugField("Ссылка", max_length=250, unique=True)
+    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -54,7 +55,7 @@ class Monster(models.Model):
     locations = models.ManyToManyField(Location,
                                        verbose_name="Локация",
                                        related_name="monsters_in_location")
-
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
 
     def __str__(self):

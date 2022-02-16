@@ -10,12 +10,14 @@ from .forms import LocationForm, ItemForm, MonsterForm
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
+from django.http import HttpResponse
 
 
 # ---- Location 
 class LocationsView(views.View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):   
         locations = Location.objects.all()
+        # locations = Location.objects.filter(user=request.user)
         monsters = Monster.objects.all()
         context = {'locations': locations, 'monsters': monsters}
         return render(request, 'items/index.html', context)
@@ -23,9 +25,7 @@ class LocationsView(views.View):
 
 @login_required
 def createlocation(request):
-    print('11??????????22')
     if request.method == 'GET':
-        print('??????????')
         return render(request, 'items/createlocation.html',
                       {'form': LocationForm()})
     else:
@@ -42,24 +42,33 @@ def createlocation(request):
                 'error': 'Bad data passed in'
             })
 
+
 @login_required
 def viewlocation(request, slug):
     location = get_object_or_404(Location, url=slug)
-    if request.method == 'GET':
-        form = LocationForm(instance=location)
-        return render(request, 'items/viewlocation.html', {'location': location, 'form': form})
+
+    print('vvvvvvvvv', location.user)
+    print('request.user', request.user)
+
+    if location.user==request.user:
+        # location = Location.objects.filter(url=slug, user=request.user)
+        if request.method == 'GET':
+            form = LocationForm(instance=location)
+            return render(request, 'items/viewlocation.html', {'location': location, 'form': form})
+        else:
+            try:
+                form = LocationForm(request.POST,
+                                    request.FILES, instance=location)
+                form.save()
+                return redirect('home')
+            except ValueError:
+                return render(request, 'items/viewlocation.html', {
+                    'location': location,
+                    'form': LocationForm(),
+                    'error': 'Bad info'
+                })
     else:
-        try:
-            form = LocationForm(request.POST,
-                                request.FILES, instance=location)
-            form.save()
-            return redirect('home')
-        except ValueError:
-            return render(request, 'items/viewlocation.html', {
-                'location': location,
-                'form': LocationForm(),
-                'error': 'Bad info'
-            })
+        return HttpResponse("Here's the text of the Web page.")
 
 
 @login_required
@@ -71,7 +80,7 @@ def deletelocation(request, slug):
 # ---- Location END
 
 # ---- Monster
-@login_required
+
 def location_detail(request, slug):
     slug = Location.objects.get(url=slug)
     locations = Location.objects.all()
@@ -82,7 +91,7 @@ def location_detail(request, slug):
     context = {'monsters': monsters, 'locations': locations}
     return render(request, 'items/location_detail.html', context)
 
-
+@login_required
 class AddMonster(FormView):
     template_name="items/createmonster.html"    
     form_class = MonsterForm
@@ -182,7 +191,7 @@ def deletemonster(request, slug):
 # ---- Monster END
 
 # ---- Item
-@login_required
+
 def monster_detail(request, slug):
     slug = Monster.objects.get(url=slug)
     locations = Location.objects.all()

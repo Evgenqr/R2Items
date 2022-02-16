@@ -1,9 +1,9 @@
 from django.contrib import admin
-from .models import Location, Monster, Category, Item#, Reviews
+from .models import Location, Monster, Category, Item #, Reviews
 
    
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ['title']
+    list_display = ['title', 'user']
     prepopulated_fields = {'url': ('title', )}
     list_filter = ['title']
 
