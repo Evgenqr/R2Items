@@ -11,6 +11,8 @@ from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
+from django.utils.text import slugify
+from transliterate import translit
 
 
 # ---- Location 
@@ -33,7 +35,12 @@ def createlocation(request):
             form = LocationForm(request.POST,
                                 request.FILES)
             newlocaltion = form.save(commit=False)
+            # newlocaltion.url = request.user
             newlocaltion.user = request.user
+            newlocaltion.url = translit(newlocaltion.title, language_code='ru', reversed=True)
+            print('!!!',newlocaltion.url)
+            newlocaltion.url = slugify(newlocaltion.url)
+            print('----',newlocaltion.url)
             newlocaltion.save()
             return redirect('home')
         except ValueError:

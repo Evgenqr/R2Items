@@ -1,7 +1,10 @@
 from django.db import models
-from django.utils.text import slugify
+# from django.utils.text import slugify
+# from transliterate import translit
 from django.urls import reverse
 from django.contrib.auth.models import User
+from django.utils.text import slugify
+
 
 DEFAULT_IMG = 'media/img_default.jpg'
 
@@ -27,23 +30,27 @@ class Location(models.Model):
     local_img = models.ImageField("Изображение",
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)
-    url = models.SlugField("Ссылка", max_length=250, unique=True)
     user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
-
+    url = models.SlugField("Ссылка", max_length=250, unique=True)
     def __str__(self):
         return self.title
      
     def get_absolute_url(self):
-        return reverse("location_list", kwargs={"slug": self.url})
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = slugify(self.title)
-    #     super(Location, self).save(*args, **kwargs)
+        return reverse("location_list", kwargs={"url": self.url})
 
     class Meta:
         verbose_name = "Локация"
         verbose_name_plural = "Локации"
-
+    
+    def save(self, *args, **kwargs):
+        if self.title:
+            # self.url = translit(self.title, language_code='ru', reversed=True)
+            # print('!!!',self.url)
+            # self.url = slugify(self.title)
+            
+            # # print('титле ', self.title)
+            # print('грл  ', self.url)
+            super(Location, self).save(*args, **kwargs)
 
 class Monster(models.Model):
     name = models.CharField(verbose_name="Название", max_length=150)

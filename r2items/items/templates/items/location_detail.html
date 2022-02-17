@@ -3,9 +3,9 @@
 {% block title %} Location {% endblock title %}
 
 {% block content %}
-
+{% if request.user.is_authenticated %}
     <a href="view/" class="text-decoration-none"> Редактировать локацию </a>
-
+{% endif %}
     <div class="col-md-12">
         <div class="row">
             {% for monster in monsters %} 
