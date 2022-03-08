@@ -1,26 +1,38 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django import views
-from .models import Item, Location, Monster#, Reviews
+from .models import Item, Location, Monster
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import LocationForm, ItemForm, MonsterForm
-from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
 
 
-# ---- Location 
-class LocationsView(views.View):
-    def get(self, request, *args, **kwargs):   
-        locations = Location.objects.all()
-        # locations = Location.objects.filter(user=request.user)
-        monsters = Monster.objects.all()
-        context = {'locations': locations, 'monsters': monsters}
-        return render(request, 'items/index.html', context)
+# ---- Location
+
+class LocationsView(ListView):
+
+    model = Location
+    template_name = 'items/index.html'
+    context_object_name = 'locations'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Главная страница'
+        return context
+    
+# class LocationsView(views.View):
+
+#     def get(self, request, *args, **kwargs):
+#         locations = Location.objects.all()
+#         # locations = Location.objects.filter(user=request.user)
+#         monsters = Monster.objects.all()
+#         context = {'locations': locations, 'monsters': monsters}
+#         return render(request, 'items/index.html', context)
 
 
 @login_required
@@ -30,8 +42,7 @@ def createlocation(request):
                       {'form': LocationForm()})
     else:
         try:
-            form = LocationForm(request.POST,
-                                request.FILES)
+            form = LocationForm(request.POST, request.FILES)
             newlocaltion = form.save(commit=False)
             newlocaltion.user = request.user
             newlocaltion.save()
@@ -50,23 +61,28 @@ def viewlocation(request, slug):
     print('vvvvvvvvv', location.user)
     print('request.user', request.user)
 
-    if location.user==request.user:
+    if location.user == request.user:
         # location = Location.objects.filter(url=slug, user=request.user)
         if request.method == 'GET':
             form = LocationForm(instance=location)
-            return render(request, 'items/viewlocation.html', {'location': location, 'form': form})
+            return render(request, 'items/viewlocation.html', {
+                'location': location,
+                'form': form
+            })
         else:
             try:
                 form = LocationForm(request.POST,
-                                    request.FILES, instance=location)
+                                    request.FILES,
+                                    instance=location)
                 form.save()
                 return redirect('home')
             except ValueError:
-                return render(request, 'items/viewlocation.html', {
-                    'location': location,
-                    'form': LocationForm(),
-                    'error': 'Bad info'
-                })
+                return render(
+                    request, 'items/viewlocation.html', {
+                        'location': location,
+                        'form': LocationForm(),
+                        'error': 'Bad info'
+                    })
     else:
         return HttpResponse("Here's the text of the Web page.")
 
@@ -77,54 +93,73 @@ def deletelocation(request, slug):
     if request.method == 'POST':
         location.delete()
         return redirect('home')
+
+
 # ---- Location END
 
 # ---- Monster
 
-def location_detail(request, slug):
-    slug = Location.objects.get(url=slug)
-    locations = Location.objects.all()
-    if slug:
-        monsters = Monster.objects.filter(locations=slug)
-    else:
-        monsters = Monster.objects.all()
-    context = {'monsters': monsters, 'locations': locations}
-    return render(request, 'items/location_detail.html', context)
+class MonstersInLocation(ListView):
+
+    model = Monster
+    template_name = 'items/location_detail.html'
+    context_object_name = 'monsters'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Location.objects.get(url=self.kwargs['slug'])
+        return context
+
+    def get_queryset(self):
+        slug = Location.objects.get(url=self.kwargs['slug'])
+        if slug:
+            return Monster.objects.filter(locations=slug)
+
+
+# def location_detail(request, slug):
+#     slug = Location.objects.get(url=slug)
+#     locations = Location.objects.all()
+#     if slug:
+#         monsters = Monster.objects.filter(locations=slug)
+#     else:
+#         monsters = Monster.objects.all()
+#     context = {'monsters': monsters, 'locations': locations}
+#     return render(request, 'items/location_detail.html', context)
+
 
 @login_required
 class AddMonster(FormView):
-    template_name="items/createmonster.html"    
+    template_name = "items/createmonster.html"
     form_class = MonsterForm
     success_url = '/'
 
     def form_valid(self, slug):
         slug = Location.objects.get(url=slug)
         print('slug ', slug)
-        locations = Location.objects.all()
+        # locations = Location.objects.all()
         monsters = Monster.objects.filter(locations=slug)
-
         instance = Monster.objects.create(locations=slug)
-
         instance.locations.add(*monsters)
-
         return redirect("/")
-    
+
+
 class Set_user(FormView):
-    template_name="items/createmonster.html"    
+    template_name = "items/createmonster.html"
     form_class = MonsterForm
     success_url = '/'
 
     def form_valid(self, form):
         name = form.cleaned_data.get('name')
-        instance = Monster(name=name,locations=location)
+        instance = Monster(name=name, locations=location)
         instance.save()
         instance.location.add(request.location.title)
         instance.save()
         return redirect("/")
 
+
 @login_required
 def createmonster(request, slug):
-    slug = Location.objects.get(url=slug)   
+    slug = Location.objects.get(url=slug)
     if request.method == 'POST':
         form = MonsterForm(request.POST, request.FILES)
         if form.is_valid():
@@ -134,7 +169,6 @@ def createmonster(request, slug):
     else:
         form = MonsterForm()
     return render(request, 'items/createmonster.html', {'form': form})
-
 
 
 # @login_required
@@ -167,11 +201,13 @@ def viewmonster(request, slug):
     monster = get_object_or_404(Monster, url=slug)
     if request.method == 'GET':
         form = MonsterForm(instance=monster)
-        return render(request, 'items/viewmonster.html', {'monster': monster, 'form': form})
+        return render(request, 'items/viewmonster.html', {
+            'monster': monster,
+            'form': form
+        })
     else:
         try:
-            form = MonsterForm(request.POST,
-                                request.FILES, instance=monster)
+            form = MonsterForm(request.POST, request.FILES, instance=monster)
             form.save()
             return redirect('home')
         except ValueError:
@@ -188,25 +224,66 @@ def deletemonster(request, slug):
     if request.method == 'POST':
         monster.delete()
         return redirect('home')
+
+
 # ---- Monster END
+
+    # def get_queryset(self):
+    #     slug = Location.objects.get(url=self.kwargs['slug'])
+    #     if slug:
+    #         return Monster.objects.filter(locations=slug)
 
 # ---- Item
 
-def monster_detail(request, slug):
-    slug = Monster.objects.get(url=slug)
-    locations = Location.objects.all()
-    print('!!!!!', slug)
-    if slug:
-        items = Item.objects.filter(monster=slug)
-    else:
-        items = Item.objects.all()
-    monsters = Monster.objects.all()
-    context = {'items': items, 'monsters': monsters, 'locations': locations}
-    return render(request, 'items/monster_detail.html', context)
+class ItemInMonster(ListView):
+
+    model = Item
+    template_name = 'items/monster_detail.html'
+    context_object_name = 'items'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Monster.objects.get(url=self.kwargs['slug'])
+        return context
+
+    def get_queryset(self):
+        slug = Monster.objects.get(url=self.kwargs['slug'])
+        if slug:
+            return Item.objects.filter(monster=slug)
+
+
+class ItemDetail(DetailView):
+    model = Item
+    # slug_url_kwarg = 'url'
+    template_name = 'items/item_detail.html'
+    context_object_name = 'items'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = Item.objects.get(slug=self.kwargs['slug'])
+        return context
+
+    # def get_queryset(self):
+    #     slug = Monster.objects.get(url=self.kwargs['slug'])
+    #     if slug:
+    #         return Item.objects.filter(monster=slug)
+
+# def monster_detail(request, slug):
+#     slug = Monster.objects.get(url=slug)
+#     locations = Location.objects.all()
+#     print('!!!!!', slug)
+#     if slug:
+#         items = Item.objects.filter(monster=slug)
+#     else:
+#         items = Item.objects.all()
+#     monsters = Monster.objects.all()
+#     context = {'items': items, 'monsters': monsters, 'locations': locations}
+#     return render(request, 'items/monster_detail.html', context)
+
 
 @login_required
 def createitem(request, slug):
-    slug = Monster.objects.get(url=slug)   
+    slug = Monster.objects.get(url=slug)
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
@@ -216,10 +293,11 @@ def createitem(request, slug):
     else:
         form = ItemForm()
     return render(request, 'items/createitem.html', {'form': form})
-            
+
 
 # ---- Item END
-    
+
+
 # ---- User
 def signupuser(request):
     if request.method == 'GET':
@@ -274,10 +352,9 @@ def logoutuser(request):
         logout(request)
         return redirect('/')
 
+
 # ---- User END
 
-            
-            
 # def get_comment(request):
 #     slug = Monster.objects.all()
 #     if slug:
@@ -302,8 +379,6 @@ def logoutuser(request):
 #         'items': items,
 #         'comments': comments
 #     })
-
-
 
 # def get_items(request, slug):
 #     slug = Monster.objects.get(slug=slug)

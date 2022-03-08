@@ -1,6 +1,9 @@
 {% extends 'base.html' %} 
 {% load static %}
-{% block title %} Location {% endblock title %}
+
+{% block title %}
+{{ title }} :: {{ block.super }}
+{% endblock %}
 
 {% block content %}
 

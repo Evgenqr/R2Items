@@ -18,11 +18,11 @@ class ItemAdmin(admin.ModelAdmin):
     list_display = [
         'name',
         'category',
-        'url',
+        'slug',
     ]
-    prepopulated_fields = {'url': ('name', )}
+    prepopulated_fields = {'slug': ('name', )}
     list_filter = ['name', 'category', 'monster']
-    list_editable = ['category', 'url']
+    list_editable = ['category', 'slug']
 
 
 # class ReviewsAdmin(admin.ModelAdmin):

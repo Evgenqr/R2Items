@@ -13,7 +13,7 @@ class ItemForm(ModelForm):
         model = Item
         fields = [
             'name', 'description', 'weight', 'category', 'monster', 'item_img',
-            'url'
+            'slug'
         ]
 
 

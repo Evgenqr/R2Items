@@ -1,7 +1,8 @@
 {% extends 'base.html' %} 
 {% load static %}
-{%block title %}  Monster
-{%  endblock title  %}
+{% block title %}
+{{ title }} :: {{ block.super }}
+{% endblock %}
 {% block content %}
 <a href="view/" class="text-decoration-none"> Редактировать монстра </a>
     <div class="col-md-12">
@@ -14,8 +15,8 @@
             {% endfor %} {% endcomment %}
                 <div class="card col-md-3 p-0 mb-3 mt-3">    
                     <div class="card-body text-center">
-                        <img src="{{ item.item_img.url }}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> <br>
-                        <h5 class="card-title">{{ item.name }}  </h5>
+                        <h5 class="card-title">  <img src="{{ item.item_img.url }}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> <br>
+                        <a href="/item/{{ item.slug }}/" class="text-decoration-none"> {{ item.name }} </a></h5>
                         <h6 class="card-title">Вес: {{ item.weight }}  </h6>
                         <strong>{{ item.category }}</strong> <br>
                         <dl class="dl-horizontal">

@@ -1,13 +1,12 @@
 from django.db import models
-from django.utils.text import slugify
 from django.urls import reverse
 from django.contrib.auth.models import User
 
 DEFAULT_IMG = 'media/img_default.jpg'
 
 
-def monster_directory_path(instance, filename):
-    return 'media/monsters/img_{0}'.format(filename)
+# def monster_directory_path(instance, filename):
+#     return 'media/monsters/img_{0}'.format(filename)
 
 
 class Category(models.Model):
@@ -28,13 +27,16 @@ class Location(models.Model):
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)
     url = models.SlugField("Ссылка", max_length=250, unique=True)
-    user = models.ForeignKey(User, verbose_name="Пользователь", on_delete=models.CASCADE)
+    user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
-     
+
     def get_absolute_url(self):
         return reverse("location_list", kwargs={"slug": self.url})
+
     # def save(self, *args, **kwargs):
     #     if not self.slug:
     #         self.slug = slugify(self.title)
@@ -56,7 +58,9 @@ class Monster(models.Model):
                                        verbose_name="Локация",
                                        related_name="monsters_in_location")
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # slug = models.SlugField("Слаг", max_length=200, db_index=True, unique=True)
+
+    # slug = models.SlugField("Слаг", max_length=200, db_index=True,
+    #                       unique=True)
 
     def __str__(self):
         return self.name
@@ -95,7 +99,7 @@ class Item(models.Model):
     monster = models.ManyToManyField(Monster,
                                      verbose_name="Выпадает с: ",
                                      related_name="monster_item")
-    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    slug = models.SlugField("Ссылка", max_length=250, unique=True)
     item_img = models.ImageField("Изображение",
                                  upload_to='media/items/',
                                  default=DEFAULT_IMG)
@@ -110,7 +114,7 @@ class Item(models.Model):
     #         self.slug = slugify(self.name)
     #     super(Item, self).save(*args, **kwargs)
     def get_absolute_url(self):
-        return reverse("item_list", kwargs={"slug": self.url})
+        return reverse("item_detail", kwargs={"slug": self.slug})
 
     class Meta:
         verbose_name = "Предмет"
@@ -137,8 +141,6 @@ class Item(models.Model):
 #     class Meta:
 #         verbose_name = "Отзыв"
 #         verbose_name_plural = "Отзывы"
-
-
 
 # class Comment(models.Model):
 #     post = models.ForeignKey(
@@ -175,7 +177,8 @@ class Item(models.Model):
 #                                blank=True,
 #                                null=True)
 #     create_date = models.DateTimeField(auto_now=True)
-#     text = models.TextField(verbose_name="текст комментария", max_length=3000)
+#     text = models.TextField(verbose_name="текст комментария",
+#                       max_length=3000)
 
 #     def __str__(self):
 #         return f"{self.author} - {self.monster} - {self.text}"
