@@ -4,8 +4,9 @@ from .models import Location, Monster, Category, Item #, Reviews
    
 class LocationAdmin(admin.ModelAdmin):
     list_display = ['title', 'user']
-    prepopulated_fields = {'url': ('title', )}
+    # prepopulated_fields = {'url': ('title', )}
     list_filter = ['title']
+    prepopulated_fields = {'url':('title',)}
 
 
 class MonsterAdmin(admin.ModelAdmin):
