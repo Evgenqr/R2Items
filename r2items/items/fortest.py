@@ -19,3 +19,12 @@ class EmailPostForm(forms.Form):
     to = forms.EmailField()  
     comments = forms.CharField(required=False,  
 			       widget=forms.Textarea)
+
+
+
+
+
+<tr><th><label for="id_item_img">Изображение:</label></th><td>
+На данный момент: <a href="/media/media/items/6ed251f9cb32d5afe35501c97e6ac9e7.png">media/items/6ed251f9cb32d5afe35501c97e6ac9e7.png</a><br>
+Изменить:
+<input type="file" name="item_img" accept="image/*" id="id_item_img"></td></tr>

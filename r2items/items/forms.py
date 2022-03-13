@@ -1,5 +1,6 @@
 from django.forms import ModelForm
-from .models import Item, Monster, Location, Category#, Reviews
+from .models import Item, Monster, Location, Category  #, Reviews
+from django import forms
 
 
 class LocationForm(ModelForm):
@@ -12,16 +13,19 @@ class ItemForm(ModelForm):
     class Meta:
         model = Item
         fields = [
-            'name', 'description', 'weight', 'category', 'monster', 'item_img',
-            'slug'
+            'name', 'description', 'weight', 'category', 'monster', 'item_img'
         ]
 
 
 class MonsterForm(ModelForm):
     class Meta:
         model = Monster
-        fields = ('name', 'description', 'monster_img', 'locations', 
-                  'url')
+        fields = ('name', 'description', 'monster_img', 'locations')
+        # widgets = {
+        #     'name': forms.TextInput(),
+        #     'description': forms.Textarea(),
+        #     'locations': forms.Select(),
+        # }
 
 
 class CategoryForm(ModelForm):

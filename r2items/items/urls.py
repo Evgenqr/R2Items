@@ -5,42 +5,51 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.LocationsView.as_view(), name="home"),
-    # path('location/<str:slug>/', views.location_detail,
-    #      name='location_detail'),
+    # -----> Location
     path('location/<str:slug>/',
          views.MonstersInLocation.as_view(),
          name='location_detail'),
-    path('location/<str:slug>/newmonster/',
-         views.createmonster,
-         name='createmonster'),
-    path('monster/<str:slug>/',
-         views.ItemInMonster.as_view(),
-         name='monster_detail'),
-    path('item/<str:slug>/',
-         views.ItemDetail.as_view(),
-         name='item_detail'),
-    # path('monster/<str:slug>/', views.monster_detail, name='monster_detail'),
-    path('signup/', views.signupuser, name='signupuser'),
-    path('logout/', views.logoutuser, name='logoutuser'),
-    path('login/', views.loginuser, name="loginuser"),
     path('create/', views.createlocation, name='createlocation'),
-    path('createitem/', views.createitem, name='createitem'),
-    path('monster/<str:slug>/newitem/',
-         views.createmonster,
-         name='createmonster'),
-    # path('createmonster/', views.createmonster, name='createmonster'),
     path('location/<str:slug>/view/', views.viewlocation, name='viewlocation'),
     path('location/<str:slug>/delete',
          views.deletelocation,
          name='deletelocation'),
+    #  <---- End Location
+
+    # -----> Monster
+    path('monster/<str:slug>/',
+         views.ItemInMonster.as_view(),
+         name='monster_detail'),
+    path('newmonster/',
+         views.createmonster,
+         name='createmonster'),
     path('monster/<str:slug>/view/', views.viewmonster, name='viewmonster'),
     path('monster/<str:slug>/delete',
          views.deletemonster,
          name='deletemonster'),
-    # path('monsters/<str:url>/',
-    #      views.get_comment,
-    #      name='names'),
+    #  <---- End Monster
+
+    # -----> Item
+    path('item/<str:slug>/',
+         views.ItemDetail.as_view(),
+         name='item_detail'),
+    path('createitem/', views.createitem, name='createitem'),
+    path('item/<str:slug>/view/', views.viewitem, name='viewitem'),
+    path('item/<str:slug>/delete',
+         views.deleteitem,
+         name='deleteitem'),
+    #  <---- End Item
+
+    # path('location/<str:slug>/newmonster/',
+    #      views.createmonster,
+    #  name='createmonster'),
+
+    # -----> For User
+    path('signup/', views.signupuser, name='signupuser'),
+    path('logout/', views.logoutuser, name='logoutuser'),
+    path('login/', views.loginuser, name="loginuser"),
+    #  <---- End For User
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

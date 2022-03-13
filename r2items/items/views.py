@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from .forms import LocationForm, ItemForm, MonsterForm
-from django.views.generic import ListView, DetailView
+from django.views.generic import ListView, DetailView, CreateView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
 from django.utils.text import slugify
@@ -49,9 +49,7 @@ def createlocation(request):
             # newlocaltion.url = request.user
             newlocaltion.user = request.user
             newlocaltion.url = translit(newlocaltion.title, language_code='ru', reversed=True)
-            print('!!!',newlocaltion.url)
             newlocaltion.url = slugify(newlocaltion.url)
-            print('----',newlocaltion.url)
             newlocaltion.save()
             return redirect('home')
         except ValueError:
@@ -64,10 +62,6 @@ def createlocation(request):
 @login_required
 def viewlocation(request, slug):
     location = get_object_or_404(Location, url=slug)
-
-    print('vvvvvvvvv', location.user)
-    print('request.user', request.user)
-
     if location.user == request.user:
         # location = Location.objects.filter(url=slug, user=request.user)
         if request.method == 'GET':
@@ -134,22 +128,6 @@ class MonstersInLocation(ListView):
 #     return render(request, 'items/location_detail.html', context)
 
 
-@login_required
-class AddMonster(FormView):
-    template_name = "items/createmonster.html"
-    form_class = MonsterForm
-    success_url = '/'
-
-    def form_valid(self, slug):
-        slug = Location.objects.get(url=slug)
-        print('slug ', slug)
-        # locations = Location.objects.all()
-        monsters = Monster.objects.filter(locations=slug)
-        instance = Monster.objects.create(locations=slug)
-        instance.locations.add(*monsters)
-        return redirect("/")
-
-
 class Set_user(FormView):
     template_name = "items/createmonster.html"
     form_class = MonsterForm
@@ -165,42 +143,22 @@ class Set_user(FormView):
 
 
 @login_required
-def createmonster(request, slug):
-    slug = Location.objects.get(url=slug)
+def createmonster(request):
     if request.method == 'POST':
         form = MonsterForm(request.POST, request.FILES)
         if form.is_valid():
-            new_monster = form.save(commit=False)
-            new_monster.save()
-            new_monster.locations.add(slug)
+            locations = form.cleaned_data.get("locations")
+            newmonster = form.save(commit=False)
+            newmonster.user = request.user
+            newmonster.url = translit(newmonster.name, language_code='ru', reversed=True)
+            newmonster.url = slugify(newmonster.url)
+            newmonster.save()
+            for local in locations:
+                newmonster.locations.add(local)
+            return redirect('home')
     else:
         form = MonsterForm()
     return render(request, 'items/createmonster.html', {'form': form})
-
-
-# @login_required
-# def createmonster(request):
-#     location = Location.objects.get(url=location)
-#     print('location ', location)
-#     # monster = location.
-#     if request.method == 'GET':
-#         return render(request, 'items/createmonster.html',
-#                       {'location': location, 'form': MonsterForm()})
-#     else:
-#         try:
-#             form = MonsterForm(request.POST, request.FILES)
-#             if form.is_valid:
-#                 newmonster = form.save(commit=False)
-#                 newmonster.user = request.user
-#                 newmonster.save()
-#                 return redirect('home')
-#         except ValueError:
-#             return render(request, 'items/createmonster.html', {
-#                 'location': location,
-#                 'monster': monster,
-#                 'form': MonsterForm(),
-#                 'error': 'Bad data passed in'
-#             })
 
 
 @login_required
@@ -261,7 +219,6 @@ class ItemInMonster(ListView):
 
 class ItemDetail(DetailView):
     model = Item
-    # slug_url_kwarg = 'url'
     template_name = 'items/item_detail.html'
     context_object_name = 'items'
 
@@ -270,37 +227,57 @@ class ItemDetail(DetailView):
         context['title'] = Item.objects.get(slug=self.kwargs['slug'])
         return context
 
-    # def get_queryset(self):
-    #     slug = Monster.objects.get(url=self.kwargs['slug'])
-    #     if slug:
-    #         return Item.objects.filter(monster=slug)
-
-# def monster_detail(request, slug):
-#     slug = Monster.objects.get(url=slug)
-#     locations = Location.objects.all()
-#     print('!!!!!', slug)
-#     if slug:
-#         items = Item.objects.filter(monster=slug)
-#     else:
-#         items = Item.objects.all()
-#     monsters = Monster.objects.all()
-#     context = {'items': items, 'monsters': monsters, 'locations': locations}
-#     return render(request, 'items/monster_detail.html', context)
-
 
 @login_required
-def createitem(request, slug):
-    slug = Monster.objects.get(url=slug)
+def createitem(request):
     if request.method == 'POST':
         form = ItemForm(request.POST, request.FILES)
         if form.is_valid():
-            new_item = form.save(commit=False)
-            new_item.save()
-            new_item.monster.add(slug)
+            monster = form.cleaned_data.get('monster')
+            newitem = form.save(commit=False)
+            newitem.user = request.user
+            newitem.slug = translit(newitem.name, language_code='ru', reversed=True)
+            newitem.slug = slugify(newitem.slug)
+            newitem.save()
+            for mob in monster:
+                newitem.monster.add(mob)
+            return redirect('home')
     else:
         form = ItemForm()
     return render(request, 'items/createitem.html', {'form': form})
 
+
+@login_required
+def viewitem(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    print('!!!!', item.item_img)
+    if request.method == 'GET':
+        form = ItemForm(instance=item)
+        return render(request, 'items/viewitem.html', {
+            'item': item,
+            'form': form
+        })
+    else:
+        try:
+            form = ItemForm(request.POST, request.FILES, instance=item)
+            form.save()
+            print('ccc', form)
+            # print('221122', item.item_img)
+            return redirect('home')
+        except ValueError:
+            return render(request, 'items/viewitem.html', {
+                'item': item,
+                'form': ItemForm(),
+                'error': 'Bad info'
+            })
+
+
+@login_required
+def deleteitem(request, slug):
+    item = get_object_or_404(Item, slug=slug)
+    if request.method == 'POST':
+        item.delete()
+        return redirect('home')
 
 # ---- Item END
 

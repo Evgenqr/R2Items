@@ -5,7 +5,7 @@
 {% block content %}
 {{ error }}
 {{ location.title }}
-<form method="POST" action="{% url 'viewlocation' location.url %}">
+<form method="POST" enctype="multipart/form-data" action="{% url 'viewlocation' location.url %}">
     {% csrf_token %}
     {{form.as_p}}
     <button type="submit" class="btn btn-success">Сохранить</button>

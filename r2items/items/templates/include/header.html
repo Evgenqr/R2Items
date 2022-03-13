@@ -15,9 +15,11 @@
         </a>
       <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
         <li><a class="dropdown-item" href="{% url 'createlocation' %}">Добавить локацию</a></li>
-        {% comment %} <li>
-          {% for location in locations %}
-          <a class="dropdown-item" href="{% url 'createmonster' location.url  %}">Добавить монстра</a> {% endfor %} </li> {% endcomment %}
+        
+         <li>
+          
+          <a class="dropdown-item" href="{% url 'createmonster' %}">Добавить монстра</a>  </li> 
+
         <li><a class="dropdown-item" href="{% url 'createitem' %}">Добавить предмет</a></li>
         <li>
             <form action="{% url 'logoutuser' %}" method="POST">
