@@ -1,20 +1,19 @@
 from django.shortcuts import redirect, render, get_object_or_404
-from django import views
-from .models import Item, Location, Monster
+from .models import Item, Location, Monster, Category
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from .forms import LocationForm, ItemForm, MonsterForm
-from django.views.generic import ListView, DetailView, CreateView
+from .forms import LocationForm, ItemForm, MonsterForm, CategoryForm
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import FormView
 from django.http import HttpResponse
 from django.utils.text import slugify
 from transliterate import translit
 
-
 # ---- Location
+
 
 class LocationsView(ListView):
 
@@ -26,7 +25,8 @@ class LocationsView(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Главная страница'
         return context
-    
+
+
 # class LocationsView(views.View):
 
 #     def get(self, request, *args, **kwargs):
@@ -46,10 +46,11 @@ def createlocation(request):
         try:
             form = LocationForm(request.POST, request.FILES)
             newlocaltion = form.save(commit=False)
-            # newlocaltion.url = request.user
             newlocaltion.user = request.user
-            newlocaltion.url = translit(newlocaltion.title, language_code='ru', reversed=True)
-            newlocaltion.url = slugify(newlocaltion.url)
+            newlocaltion.slug = translit(newlocaltion.title,
+                                         language_code='ru',
+                                         reversed=True)
+            newlocaltion.slug = slugify(newlocaltion.slug)
             newlocaltion.save()
             return redirect('home')
         except ValueError:
@@ -61,9 +62,9 @@ def createlocation(request):
 
 @login_required
 def viewlocation(request, slug):
-    location = get_object_or_404(Location, url=slug)
+    location = get_object_or_404(Location, slug=slug)
     if location.user == request.user:
-        # location = Location.objects.filter(url=slug, user=request.user)
+        # location = Location.objects.filter(slug=slug, user=request.user)
         if request.method == 'GET':
             form = LocationForm(instance=location)
             return render(request, 'items/viewlocation.html', {
@@ -90,7 +91,7 @@ def viewlocation(request, slug):
 
 @login_required
 def deletelocation(request, slug):
-    location = get_object_or_404(Location, url=slug)
+    location = get_object_or_404(Location, slug=slug)
     if request.method == 'POST':
         location.delete()
         return redirect('home')
@@ -100,6 +101,7 @@ def deletelocation(request, slug):
 
 # ---- Monster
 
+
 class MonstersInLocation(ListView):
 
     model = Monster
@@ -108,24 +110,13 @@ class MonstersInLocation(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Location.objects.get(url=self.kwargs['slug'])
+        context['title'] = Location.objects.get(slug=self.kwargs['slug'])
         return context
 
     def get_queryset(self):
-        slug = Location.objects.get(url=self.kwargs['slug'])
+        slug = Location.objects.get(slug=self.kwargs['slug'])
         if slug:
             return Monster.objects.filter(locations=slug)
-
-
-# def location_detail(request, slug):
-#     slug = Location.objects.get(url=slug)
-#     locations = Location.objects.all()
-#     if slug:
-#         monsters = Monster.objects.filter(locations=slug)
-#     else:
-#         monsters = Monster.objects.all()
-#     context = {'monsters': monsters, 'locations': locations}
-#     return render(request, 'items/location_detail.html', context)
 
 
 class Set_user(FormView):
@@ -150,8 +141,10 @@ def createmonster(request):
             locations = form.cleaned_data.get("locations")
             newmonster = form.save(commit=False)
             newmonster.user = request.user
-            newmonster.url = translit(newmonster.name, language_code='ru', reversed=True)
-            newmonster.url = slugify(newmonster.url)
+            newmonster.slug = translit(newmonster.name,
+                                       language_code='ru',
+                                       reversed=True)
+            newmonster.slug = slugify(newmonster.slug)
             newmonster.save()
             for local in locations:
                 newmonster.locations.add(local)
@@ -163,7 +156,7 @@ def createmonster(request):
 
 @login_required
 def viewmonster(request, slug):
-    monster = get_object_or_404(Monster, url=slug)
+    monster = get_object_or_404(Monster, slug=slug)
     if request.method == 'GET':
         form = MonsterForm(instance=monster)
         return render(request, 'items/viewmonster.html', {
@@ -185,7 +178,7 @@ def viewmonster(request, slug):
 
 @login_required
 def deletemonster(request, slug):
-    monster = get_object_or_404(Monster, url=slug)
+    monster = get_object_or_404(Monster, slug=slug)
     if request.method == 'POST':
         monster.delete()
         return redirect('home')
@@ -193,26 +186,27 @@ def deletemonster(request, slug):
 
 # ---- Monster END
 
-    # def get_queryset(self):
-    #     slug = Location.objects.get(url=self.kwargs['slug'])
-    #     if slug:
-    #         return Monster.objects.filter(locations=slug)
+# def get_queryset(self):
+#     slug = Location.objects.get(slug=self.kwargs['slug'])
+#     if slug:
+#         return Monster.objects.filter(locations=slug)
 
 # ---- Item
+
 
 class ItemInMonster(ListView):
 
     model = Item
     template_name = 'items/monster_detail.html'
     context_object_name = 'items'
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Monster.objects.get(url=self.kwargs['slug'])
+        context['title'] = Monster.objects.get(slug=self.kwargs['slug'])
         return context
 
     def get_queryset(self):
-        slug = Monster.objects.get(url=self.kwargs['slug'])
+        slug = Monster.objects.get(slug=self.kwargs['slug'])
         if slug:
             return Item.objects.filter(monster=slug)
 
@@ -236,7 +230,9 @@ def createitem(request):
             monster = form.cleaned_data.get('monster')
             newitem = form.save(commit=False)
             newitem.user = request.user
-            newitem.slug = translit(newitem.name, language_code='ru', reversed=True)
+            newitem.slug = translit(newitem.name,
+                                    language_code='ru',
+                                    reversed=True)
             newitem.slug = slugify(newitem.slug)
             newitem.save()
             for mob in monster:
@@ -250,7 +246,6 @@ def createitem(request):
 @login_required
 def viewitem(request, slug):
     item = get_object_or_404(Item, slug=slug)
-    print('!!!!', item.item_img)
     if request.method == 'GET':
         form = ItemForm(instance=item)
         return render(request, 'items/viewitem.html', {
@@ -261,8 +256,6 @@ def viewitem(request, slug):
         try:
             form = ItemForm(request.POST, request.FILES, instance=item)
             form.save()
-            print('ccc', form)
-            # print('221122', item.item_img)
             return redirect('home')
         except ValueError:
             return render(request, 'items/viewitem.html', {
@@ -279,7 +272,73 @@ def deleteitem(request, slug):
         item.delete()
         return redirect('home')
 
+
 # ---- Item END
+
+
+# ---- Category
+@login_required
+def createcategory(request):
+    if request.method == 'GET':
+        return render(request, 'items/createcategory.html',
+                      {'form': CategoryForm()})
+    else:
+        try:
+            form = CategoryForm(request.POST, request.FILES)
+            newcategory = form.save(commit=False)
+            # newlocaltion.slug = request.user
+            newcategory.user = request.user
+            newcategory.slug = translit(newcategory.name,
+                                        language_code='ru',
+                                        reversed=True)
+            newcategory.slug = slugify(newcategory.slug)
+            newcategory.save()
+            return redirect('home')
+        except ValueError:
+            return render(request, 'items/createcategory.html', {
+                'form': CategoryForm(),
+                'error': 'Bad data passed in'
+            })
+
+
+@login_required
+def viewcategory(request, slug):
+    location = get_object_or_404(Location, slug=slug)
+    if location.user == request.user:
+        # location = Location.objects.filter(slug=slug, user=request.user)
+        if request.method == 'GET':
+            form = LocationForm(instance=location)
+            return render(request, 'items/viewlocation.html', {
+                'location': location,
+                'form': form
+            })
+        else:
+            try:
+                form = LocationForm(request.POST,
+                                    request.FILES,
+                                    instance=location)
+                form.save()
+                return redirect('home')
+            except ValueError:
+                return render(
+                    request, 'items/viewlocation.html', {
+                        'location': location,
+                        'form': LocationForm(),
+                        'error': 'Bad info'
+                    })
+    else:
+        return HttpResponse("Here's the text of the Web page.")
+
+
+@login_required
+def deletecategory(request, slug):
+    location = get_object_or_404(Category, slug=slug)
+    if request.method == 'POST':
+        location.delete()
+        return redirect('home')
+
+
+# ---- Category END
 
 
 # ---- User

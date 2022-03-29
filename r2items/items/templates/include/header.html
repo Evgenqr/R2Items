@@ -21,6 +21,8 @@
           <a class="dropdown-item" href="{% url 'createmonster' %}">Добавить монстра</a>  </li> 
 
         <li><a class="dropdown-item" href="{% url 'createitem' %}">Добавить предмет</a></li>
+        
+        <li><a class="dropdown-item" href="{% url 'createcategory' %}">Добавить категорию предмета</a></li>
         <li>
             <form action="{% url 'logoutuser' %}" method="POST">
                 {% csrf_token %}

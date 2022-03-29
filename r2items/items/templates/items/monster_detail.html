@@ -4,15 +4,15 @@
 {{ title }} :: {{ block.super }}
 {% endblock %}
 {% block content %}
+<h1> 
+{{ title }} </h1>
 {% if request.user.is_authenticated %}
 <a href="view/" class="text-decoration-none"> Редактировать монстра </a>
-{% endif %}
-
+{% endif %} {{monsters.user}}
     <div class="col-md-12">
         <div class="row">
- 
-
-            {% for item in items %} 
+             {% for item in items %} 
+            
             {% comment %} {% for mob in item.monster.all %}
             {{ mob.name}}
             {% endfor %} {% endcomment %}
@@ -27,8 +27,6 @@
                     </div>
             {% endfor %}
         </div>    
-
-
         <form action="" method="post">
             {% csrf_token %}
           

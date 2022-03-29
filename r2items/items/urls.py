@@ -40,6 +40,17 @@ urlpatterns = [
          name='deleteitem'),
     #  <---- End Item
 
+    # -----> Category
+    # path('item/<str:url>/',
+    #      views.ItemDetail.as_view(),
+    #      name='item_detail'),
+    path('createcategory/', views.createcategory, name='createcategory'),
+    path('item/<str:slug>/view/', views.viewcategory, name='viewcategory'),
+    path('item/<str:slug>/delete',
+         views.deletecategory,
+         name='deletecategory'),
+    #  <---- End Category
+
     # path('location/<str:slug>/newmonster/',
     #      views.createmonster,
     #  name='createmonster'),

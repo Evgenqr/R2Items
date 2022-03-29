@@ -6,20 +6,25 @@
 {% endblock %}
 
 {% block content %}
+
+<h1> {{ title }} </h1>
+
     {% if request.user.is_authenticated %}
         <a href="view/" class="text-decoration-none"> Редактировать локацию </a>
     {% endif %}
+    {{location.user}}
         <div class="col-md-12">
             <div class="row">
                 {% for monster in monsters %} 
+               
                     <div class="card col-md-2 p-0 mb-3 mt-3"> 
                         <div class="card-body text-center">
                             <img src="{{ monster.monster_img.url }}" alt="image" class="img-fluid rounded-start" width="100px" height="150px"/>
                             <h6 class="card-title">   
-                                <a href="/monster/{{ monster.url }}/" class="text-decoration-none"> {{ monster.name }} </a>
+                                <a href="/monster/{{ monster.slug }}/" class="text-decoration-none"> {{ monster.name }} </a>
                             </h6>
                             <div class="card-body text-center">
-                                <a href="/monster/{{ monster.url }}/" class="btn btn-primary">Подробнее</a>
+                                <a href="/monster/{{ monster.slug }}/" class="btn btn-primary">Подробнее</a>
                             </div>
                         </div>             
                     </div>

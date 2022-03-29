@@ -11,7 +11,10 @@ DEFAULT_IMG = 'media/img_default.jpg'
 
 class Category(models.Model):
     name = models.CharField(verbose_name="Название", max_length=150)
-    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    slug = models.SlugField("Ссылка", max_length=250, unique=True)
+    user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -26,7 +29,7 @@ class Location(models.Model):
     local_img = models.ImageField("Изображение",
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)
-    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    slug = models.SlugField("Ссылка", max_length=250, unique=True)
     user = models.ForeignKey(User,
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
@@ -35,7 +38,7 @@ class Location(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("location_list", kwargs={"slug": self.url})
+        return reverse("location_list", kwargs={"slug": self.slug})
 
     # def save(self, *args, **kwargs):
     #     if not self.slug:
@@ -53,41 +56,26 @@ class Monster(models.Model):
     monster_img = models.FileField("Изображение",
                                    upload_to="media/monsters",
                                    default=DEFAULT_IMG)
-    url = models.SlugField("Ссылка", max_length=250, unique=True)
+    slug = models.SlugField("Ссылка", max_length=250, unique=True)
     locations = models.ManyToManyField(Location,
                                        verbose_name="Локация",
                                        related_name="monsters_in_location")
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-    # slug = models.SlugField("Слаг", max_length=200, db_index=True,
-    #                       unique=True)
+    user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("monster_list", kwargs={"slug": self.url})
-
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = slugify(self.name)
-    #     super(Monster, self).save(*args, **kwargs)
+        return reverse("monster_list", kwargs={"slug": self.slug})
 
     class Meta:
         verbose_name = "Монстр"
         verbose_name_plural = "Монстры"
 
-    # def get_absolute_url(self):
-    #     return reverse('items:monster_list_by_location',
-    # args=[self.id, self.slug])
-
 
 class Item(models.Model):
-    author = models.ForeignKey(User,
-                               on_delete=models.CASCADE,
-                               verbose_name="Автор",
-                               blank=True,
-                               null=True)
     name = models.CharField(verbose_name="Предмет", max_length=150)
     description = models.TextField(verbose_name="Описание",
                                    null=True,
@@ -103,16 +91,13 @@ class Item(models.Model):
     item_img = models.ImageField("Изображение",
                                  upload_to='media/items/',
                                  default=DEFAULT_IMG)
-
-    # slug = models.SlugField("Слаг", max_length=130, unique=True)
+    user = models.ForeignKey(User,
+                             verbose_name="Пользователь",
+                             on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = slugify(self.name)
-    #     super(Item, self).save(*args, **kwargs)
     def get_absolute_url(self):
         return reverse("item_detail", kwargs={"slug": self.slug})
 

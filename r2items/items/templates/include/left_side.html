@@ -12,7 +12,7 @@
         <li><i class="fab fa-wpforms icon"></i> Locations
           <ul>
               {% comment %} {% for location in locations %}
-            <li><i class="fas fa-pencil-alt icon"></i><a href="{% url 'location_detail' location.url %}">  {{ location.title }}</a></li>
+            <li><i class="fas fa-pencil-alt icon"></i><a href="{% url 'location_detail' location.slug %}">  {{ location.title }}</a></li>
             
             {% endfor %} {% endcomment %}
           </ul>
