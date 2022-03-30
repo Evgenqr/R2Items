@@ -60,6 +60,7 @@ urlpatterns = [
     path('logout/', views.logoutuser, name='logoutuser'),
     path('login/', views.loginuser, name="loginuser"),
     #  <---- End For User
+    path('search/', views.SearchView.as_view(), name='search'),
 ]
 
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

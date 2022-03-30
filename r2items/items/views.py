@@ -11,6 +11,10 @@ from django.views.generic.edit import FormView
 from django.http import HttpResponse
 from django.utils.text import slugify
 from transliterate import translit
+from django.db.models import Q
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.views import View
+
 
 # ---- Location
 
@@ -397,6 +401,44 @@ def logoutuser(request):
 
 
 # ---- User END
+
+
+class SearchView(View):
+    template_name = 'items/search_result.html'
+     
+    def get(self, request, *args, **kwargs):
+        context = {}
+ 
+        q = request.GET.get('q')
+        if q:
+            query_sets = []  # Общий QuerySet
+ 
+            # Ищем по всем моделям
+            query_sets.append(Location.objects.search(query=q))
+            query_sets.append(Monster.objects.search(query=q))
+            query_sets.append(Item.objects.search(query=q))
+            query_sets.append(Category.objects.search(query=q))
+            print('***', query_sets)
+            # и объединяем выдачу
+            final_set = list(chain(*query_sets))
+            final_set.sort(key=lambda x: x.pub_date, reverse=True)  # Выполняем сортировку
+ 
+            context['last_question'] = '?q=%s' % q
+ 
+            # current_page = Paginator(final_set, 10)
+ 
+            # page = request.GET.get('page')
+            # try:
+            #     context['object_list'] = current_page.page(page)
+            # except PageNotAnInteger:
+            #     context['object_list'] = current_page.page(1)
+            # except EmptyPage:
+            #     context['object_list'] = current_page.page(current_page.num_pages)
+ 
+        return render(request=request, template_name=self.template_name, context=context)
+
+
+
 
 # def get_comment(request):
 #     slug = Monster.objects.all()

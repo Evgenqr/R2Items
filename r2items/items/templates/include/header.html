@@ -29,6 +29,7 @@
                 <li><button type="submit" class="btn btn-light">Выйти</button></li>
                 </form>
            </li>
+
           <!-- <li><a class="dropdown-item" href="{% url 'logoutuser' %}" role="button">exit</a></li> -->
         
       </ul>
@@ -40,9 +41,12 @@
         <li><a class="dropdown-item" href="{% url 'signupuser' %}">Регистрация</a></li>
         <li><a class="dropdown-item" href="{% url 'loginuser' %}">Авторизация</a></li>
       </ul>
-
-    {% endif %}
-
+    {% endif %}      
+    <ul>
+      <form action="{% url 'search' %}" method="get">
+        <input name="q" type="text" placeholder="Search...">
+      </form>
+    </ul>
   </ul>
   </div>
 
