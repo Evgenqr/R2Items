@@ -36,7 +36,7 @@ class Location(models.Model):
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
 
-    objects = UserManager()
+ 
     def __str__(self):
         return self.title
 
