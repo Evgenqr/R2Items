@@ -14,6 +14,7 @@ from transliterate import translit
 from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views import View
+from itertools import chain
 
 
 # ---- Location
@@ -123,18 +124,18 @@ class MonstersInLocation(ListView):
             return Monster.objects.filter(locations=slug)
 
 
-class Set_user(FormView):
-    template_name = "items/createmonster.html"
-    form_class = MonsterForm
-    success_url = '/'
+# class Set_user(FormView):
+#     template_name = "items/createmonster.html"
+#     form_class = MonsterForm
+#     success_url = '/'
 
-    def form_valid(self, form):
-        name = form.cleaned_data.get('name')
-        instance = Monster(name=name, locations=location)
-        instance.save()
-        instance.location.add(request.location.title)
-        instance.save()
-        return redirect("/")
+#     def form_valid(self, form):
+#         name = form.cleaned_data.get('name')
+#         instance = Monster(name=name, locations=location)
+#         instance.save()
+#         instance.location.add(request.location.title)
+#         instance.save()
+#         return redirect("/")
 
 
 @login_required
@@ -405,28 +406,31 @@ def logoutuser(request):
 
 class SearchView(View):
     template_name = 'items/search_result.html'
-     
+
     def get(self, request, *args, **kwargs):
         context = {}
- 
         q = request.GET.get('q')
+        print('!!!!!', q)
         if q:
+            print('!!!!!', q)
             query_sets = []  # Общий QuerySet
- 
+
             # Ищем по всем моделям
-            query_sets.append(Location.objects.search(query=q))
-            query_sets.append(Monster.objects.search(query=q))
-            query_sets.append(Item.objects.search(query=q))
-            query_sets.append(Category.objects.search(query=q))
+            query_sets.append(Location.objects.filter(title__icontains=q))
+            query_sets.append(Monster.objects.filter(name__icontains=q))
+            query_sets.append(Item.objects.filter(name__icontains=q))
+            query_sets.append(Category.objects.filter(name__icontains=q))
             print('***', query_sets)
             # и объединяем выдачу
             final_set = list(chain(*query_sets))
-            final_set.sort(key=lambda x: x.pub_date, reverse=True)  # Выполняем сортировку
- 
+           
+            # final_set.sort(key=lambda x: x.pub_date, reverse=True)  #  Выполняем сортировку
             context['last_question'] = '?q=%s' % q
- 
+
             # current_page = Paginator(final_set, 10)
- 
+            print('-----', final_set)
+            entry_list = list(final_set)
+            print('11-----22', entry_list)
             # page = request.GET.get('page')
             # try:
             #     context['object_list'] = current_page.page(page)
@@ -434,8 +438,19 @@ class SearchView(View):
             #     context['object_list'] = current_page.page(1)
             # except EmptyPage:
             #     context['object_list'] = current_page.page(current_page.num_pages)
- 
+
         return render(request=request, template_name=self.template_name, context=context)
+
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['title'] = Monster.objects.get(slug=self.kwargs['slug'])
+#         return context
+
+#     def get_queryset(self):
+#         slug = Monster.objects.get(slug=self.kwargs['slug'])
+#         if slug:
+#             return Item.objects.filter(monster=slug)
 
 
 

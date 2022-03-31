@@ -17,7 +17,6 @@ class Category(models.Model):
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
 
-    
     def __str__(self):
         return self.name
 
@@ -36,7 +35,6 @@ class Location(models.Model):
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
 
- 
     def __str__(self):
         return self.title
 
@@ -66,8 +64,7 @@ class Monster(models.Model):
     user = models.ForeignKey(User,
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
-  
-    
+
     def __str__(self):
         return self.name
 
@@ -98,8 +95,7 @@ class Item(models.Model):
     user = models.ForeignKey(User,
                              verbose_name="Пользователь",
                              on_delete=models.CASCADE)
-   
-    
+
     def __str__(self):
         return self.name
 
