@@ -15,6 +15,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views import View
 from itertools import chain
+from django.views.generic import TemplateView, ListView
 
 
 # ---- Location
@@ -404,8 +405,11 @@ def logoutuser(request):
 # ---- User END
 
 
-class SearchView(View):
+class SearchView(ListView):
     template_name = 'items/search_result.html'
+
+    # def get_queryset(self): # новый
+    #     return Item.objects.filter(name__icontains='сундук')
 
     def get(self, request, *args, **kwargs):
         context = {}
@@ -418,7 +422,7 @@ class SearchView(View):
             # Ищем по всем моделям
             query_sets.append(Location.objects.filter(title__icontains=q))
             query_sets.append(Monster.objects.filter(name__icontains=q))
-            query_sets.append(Item.objects.filter(name__icontains=q))
+            query_sets.append(Item.objects.filter(name=q))
             query_sets.append(Category.objects.filter(name__icontains=q))
             print('***', query_sets)
             # и объединяем выдачу
@@ -427,19 +431,20 @@ class SearchView(View):
             # final_set.sort(key=lambda x: x.pub_date, reverse=True)  #  Выполняем сортировку
             context['last_question'] = '?q=%s' % q
 
-            # current_page = Paginator(final_set, 10)
+            current_page = Paginator(final_set, 10)
             print('-----', final_set)
             entry_list = list(final_set)
             print('11-----22', entry_list)
-            # page = request.GET.get('page')
-            # try:
-            #     context['object_list'] = current_page.page(page)
-            # except PageNotAnInteger:
-            #     context['object_list'] = current_page.page(1)
-            # except EmptyPage:
-            #     context['object_list'] = current_page.page(current_page.num_pages)
+            page = request.GET.get('page')
+            try:
+                context['object_list'] = current_page.page(page)
+            except PageNotAnInteger:
+                context['object_list'] = current_page.page(1)
+            except EmptyPage:
+                context['object_list'] = current_page.page(current_page.num_pages)
 
         return render(request=request, template_name=self.template_name, context=context)
+
 
 
 #     def get_context_data(self, **kwargs):

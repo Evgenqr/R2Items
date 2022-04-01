@@ -19,6 +19,9 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def get_absolute_url(self):
+        return reverse("category_detail", kwargs={"slug": self.slug})
 
     class Meta:
         verbose_name = "Категория предмета"
@@ -39,7 +42,7 @@ class Location(models.Model):
         return self.title
 
     def get_absolute_url(self):
-        return reverse("location_list", kwargs={"slug": self.slug})
+        return reverse("location_detail", kwargs={"slug": self.slug})
 
     # def save(self, *args, **kwargs):
     #     if not self.slug:
@@ -69,7 +72,8 @@ class Monster(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse("monster_list", kwargs={"slug": self.slug})
+        return reverse("monster_detail", kwargs={"slug": self.slug})
+    
 
     class Meta:
         verbose_name = "Монстр"

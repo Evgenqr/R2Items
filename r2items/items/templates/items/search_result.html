@@ -1,24 +1,18 @@
-{% extends 'base.html' %} 
-{% load static %}
-{% block title %}
-{{ title }} :: {{ block.super }}
-{% endblock %}
-{% block content %}
 
+{% block content %}
     <h1>Поиск</h1>
-    {% if last_question %}
-  
-    {{ last_question }}
-        {% for object in last_question %}
+    {% if object_list %}
+        {% for object in object_list %}
             <div>
-                <a href="{{ object.name }}">
+                <a href="{{ object.get_absolute_url }}">
                     <h2>{{ object.itle }}</h2>
+                    <h2>{{ object.name }}</h2>
                 </a>
-                {{ object.content|safe }}
+                {% comment %} {{ object.name|safe }} {% endcomment %}
                 <p><a class="btn btn-default btn-sm" href="{{ object.get_absolute_url }}">Читать далее</a></p>
             </div>
         {% endfor %}
-        {%  url 'last_question' %}
+   
     {% else %}
         <p>Не найдено публикаций по вашему запросу<br>Попробуйте повторить запрос с другой формулировкой</p>
     {% endif %}

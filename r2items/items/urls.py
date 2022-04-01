@@ -5,6 +5,7 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.LocationsView.as_view(), name="home"),
+    
     # -----> Location
     path('location/<str:slug>/',
          views.MonstersInLocation.as_view(),
