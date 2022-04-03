@@ -416,15 +416,13 @@ class SearchView(ListView):
         q = request.GET.get('q')
         print('!!!!!', q)
         if q:
-            print('!!!!!', q)
             query_sets = []  # Общий QuerySet
-
-            # Ищем по всем моделям
             query_sets.append(Location.objects.filter(title__icontains=q))
             query_sets.append(Monster.objects.filter(name__icontains=q))
-            query_sets.append(Item.objects.filter(name=q))
+            query_sets.append(Item.objects.filter(name__icontains=q))
             query_sets.append(Category.objects.filter(name__icontains=q))
             print('***', query_sets)
+            # Ищем по всем моделям
             # и объединяем выдачу
             final_set = list(chain(*query_sets))
            
@@ -433,8 +431,6 @@ class SearchView(ListView):
 
             current_page = Paginator(final_set, 10)
             print('-----', final_set)
-            entry_list = list(final_set)
-            print('11-----22', entry_list)
             page = request.GET.get('page')
             try:
                 context['object_list'] = current_page.page(page)
