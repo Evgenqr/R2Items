@@ -23,27 +23,20 @@
 </head>
 <body>
     <div class="container">
-        {% include 'include/header.html' %} 
-        <div class="row">
-            <div class="col-sm-2">
-            
-                {% include 'include/left_side.html' %}            
-            </div>
+        <div class="row">  
+            {% include 'include/header.html' %} 
+           
+            <div class="col-sm-2">    
+                {% comment %} {% include 'include/left_side.html' %}            {% endcomment %}      
+            </div> 
             <div class="col-sm-10">
-
                 {% block content %}
-                
                 {% endblock content %}
+ 
             </div>
-          </div>
-          {% include 'include/footer.html' %} 
+           
         </div>
-
-      
-
-      
-
-
-    </div>      
+        {% include 'include/footer.html' %}  
+    </div>     
 </body>
 </html>
