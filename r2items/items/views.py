@@ -29,7 +29,7 @@ class LocationsView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = 'Главная страница'
+        context['name'] = 'Главная страница'
         return context
 
 
@@ -53,7 +53,7 @@ def createlocation(request):
             form = LocationForm(request.POST, request.FILES)
             newlocaltion = form.save(commit=False)
             newlocaltion.user = request.user
-            newlocaltion.slug = translit(newlocaltion.title,
+            newlocaltion.slug = translit(newlocaltion.name,
                                          language_code='ru',
                                          reversed=True)
             newlocaltion.slug = slugify(newlocaltion.slug)
@@ -116,7 +116,7 @@ class MonstersInLocation(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Location.objects.get(slug=self.kwargs['slug'])
+        context['name'] = Location.objects.get(slug=self.kwargs['slug'])
         return context
 
     def get_queryset(self):
@@ -134,7 +134,7 @@ class MonstersInLocation(ListView):
 #         name = form.cleaned_data.get('name')
 #         instance = Monster(name=name, locations=location)
 #         instance.save()
-#         instance.location.add(request.location.title)
+#         instance.location.add(request.location.name)
 #         instance.save()
 #         return redirect("/")
 
@@ -208,7 +208,7 @@ class ItemInMonster(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Monster.objects.get(slug=self.kwargs['slug'])
+        context['name'] = Monster.objects.get(slug=self.kwargs['slug'])
         return context
 
     def get_queryset(self):
@@ -224,7 +224,7 @@ class ItemDetail(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = Item.objects.get(slug=self.kwargs['slug'])
+        context['name'] = Item.objects.get(slug=self.kwargs['slug'])
         return context
 
 
@@ -414,14 +414,12 @@ class SearchView(ListView):
     def get(self, request, *args, **kwargs):
         context = {}
         q = request.GET.get('q')
-        print('!!!!!', q)
         if q:
             query_sets = []  # Общий QuerySet
-            query_sets.append(Location.objects.filter(title__icontains=q))
+            query_sets.append(Location.objects.filter(name__icontains=q))
             query_sets.append(Monster.objects.filter(name__icontains=q))
             query_sets.append(Item.objects.filter(name__icontains=q))
             query_sets.append(Category.objects.filter(name__icontains=q))
-            print('***', query_sets)
             # Ищем по всем моделям
             # и объединяем выдачу
             final_set = list(chain(*query_sets))
@@ -430,7 +428,6 @@ class SearchView(ListView):
             context['last_question'] = '?q=%s' % q
 
             current_page = Paginator(final_set, 10)
-            print('-----', final_set)
             page = request.GET.get('page')
             try:
                 context['object_list'] = current_page.page(page)
@@ -445,7 +442,7 @@ class SearchView(ListView):
 
 #     def get_context_data(self, **kwargs):
 #         context = super().get_context_data(**kwargs)
-#         context['title'] = Monster.objects.get(slug=self.kwargs['slug'])
+#         context['name'] = Monster.objects.get(slug=self.kwargs['slug'])
 #         return context
 
 #     def get_queryset(self):

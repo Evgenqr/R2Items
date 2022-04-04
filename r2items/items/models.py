@@ -29,7 +29,7 @@ class Category(models.Model):
 
 
 class Location(models.Model):
-    title = models.CharField(verbose_name="Название", max_length=150)
+    name = models.CharField(verbose_name="Название", max_length=150)
     local_img = models.ImageField("Изображение",
                                   upload_to="media/locations",
                                   default=DEFAULT_IMG)

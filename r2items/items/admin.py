@@ -3,10 +3,10 @@ from .models import Location, Monster, Category, Item
 
    
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ['title', 'user']
-    # prepopulated_fields = {'slug': ('title', )}
-    list_filter = ['title']
-    prepopulated_fields = {'slug': ('title',)}
+    list_display = ['name', 'user']
+    # prepopulated_fields = {'slug': ('name', )}
+    list_filter = ['name']
+    prepopulated_fields = {'slug': ('name',)}
 
 
 class MonsterAdmin(admin.ModelAdmin):

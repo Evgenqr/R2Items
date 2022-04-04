@@ -5,7 +5,7 @@ from .models import Item, Monster, Location, Category
 class LocationForm(ModelForm):
     class Meta:
         model = Location
-        fields = ['title', 'local_img']
+        fields = ['name', 'local_img']
 
 
 class ItemForm(ModelForm):
