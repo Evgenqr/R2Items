@@ -5,11 +5,6 @@ from django.contrib.auth.models import User
 
 DEFAULT_IMG = 'media/img_default.jpg'
 
-
-# def monster_directory_path(instance, filename):
-#     return 'media/monsters/img_{0}'.format(filename)
-
-
 class Category(models.Model):
     name = models.CharField(verbose_name="Название", max_length=150)
     slug = models.SlugField("Ссылка", max_length=250, unique=True)
@@ -39,15 +34,11 @@ class Location(models.Model):
                              on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.title
+        return self.name
 
     def get_absolute_url(self):
         return reverse("location_detail", kwargs={"slug": self.slug})
 
-    # def save(self, *args, **kwargs):
-    #     if not self.slug:
-    #         self.slug = slugify(self.title)
-    #     super(Location, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Локация"

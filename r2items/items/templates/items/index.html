@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-{{ title }} :: {{ block.super }}
+Главная страница :: {{ block.super }}
 {% endblock %}
 
 {% block content %} 
@@ -13,7 +13,7 @@
             <img src="{{ location.local_img.url }}" alt="image" class="img-fluid rounded-start" />
             <div class="card-body text-center">
                 <h6 class="card-title"> <a href="location/{{ location.slug }}" class="text-decoration-none">
-                {{location.title}}  </a></h5>
+                {{location.name}}  </a></h5>
             </div>
             <div class="card-body text-center">
             <a href="/location/{{ location.slug }}" class="btn btn-primary">Подробнее</a>

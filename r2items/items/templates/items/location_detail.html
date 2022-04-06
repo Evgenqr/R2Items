@@ -2,14 +2,15 @@
 {% load static %}
 
 {% block title %}
-    {{ title }} :: {{ block.super }}
+    {{ name }} :: {{ block.super }}
 {% endblock %}
 
 {% block content %}
-    {% if request.user.is_authenticated %}
-    <h2> {{ title }}  <a href="view/" class="text-decoration-none" title="Редактировать">  &#9998; </a> </h2>
+    <h5> Автор: {{  name.user}} </h5>
+    {% if request.user.is_authenticated and request.user == name.user or request.user.is_superuser  %}
+    <h2> {{ name }}  <a href="view/" class="text-decoration-none" title="Редактировать локацию">  &#9998; </a> </h2>
     {% else %}
-        <h2> {{ title }} </h2>
+        <h2> {{name }} </h2>
     {% endif %}
         <div class="col-md-12">
             <div class="row">

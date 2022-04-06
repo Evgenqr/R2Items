@@ -4,7 +4,6 @@ from .models import Location, Monster, Category, Item
    
 class LocationAdmin(admin.ModelAdmin):
     list_display = ['name', 'user']
-    # prepopulated_fields = {'slug': ('name', )}
     list_filter = ['name']
     prepopulated_fields = {'slug': ('name',)}
 

@@ -1,6 +1,7 @@
+from urllib import request
 from django.shortcuts import redirect, render, get_object_or_404
 from .models import Item, Location, Monster, Category
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.db import IntegrityError
 from django.contrib.auth import login, logout, authenticate
@@ -16,13 +17,11 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.views import View
 from itertools import chain
 from django.views.generic import TemplateView, ListView
-
-
+   
+    
 # ---- Location
-
-
 class LocationsView(ListView):
-
+    
     model = Location
     template_name = 'items/index.html'
     context_object_name = 'locations'
@@ -31,16 +30,6 @@ class LocationsView(ListView):
         context = super().get_context_data(**kwargs)
         context['name'] = 'Главная страница'
         return context
-
-
-# class LocationsView(views.View):
-
-#     def get(self, request, *args, **kwargs):
-#         locations = Location.objects.all()
-#         # locations = Location.objects.filter(user=request.user)
-#         monsters = Monster.objects.all()
-#         context = {'locations': locations, 'monsters': monsters}
-#         return render(request, 'items/index.html', context)
 
 
 @login_required
@@ -69,8 +58,7 @@ def createlocation(request):
 @login_required
 def viewlocation(request, slug):
     location = get_object_or_404(Location, slug=slug)
-    if location.user == request.user:
-        # location = Location.objects.filter(slug=slug, user=request.user)
+    if location.user == request.user or request.user.has_perm('auth.change_user'):
         if request.method == 'GET':
             form = LocationForm(instance=location)
             return render(request, 'items/viewlocation.html', {
@@ -92,28 +80,26 @@ def viewlocation(request, slug):
                         'error': 'Bad info'
                     })
     else:
-        return HttpResponse("Here's the text of the Web page.")
+        return redirect('/')
 
 
 @login_required
 def deletelocation(request, slug):
-    location = get_object_or_404(Location, slug=slug)
-    if request.method == 'POST':
-        location.delete()
-        return redirect('home')
-
-
+    if location.user == request.user:
+        location = get_object_or_404(Location, slug=slug)
+        if request.method == 'POST':
+            location.delete()
+            return redirect('home')
+    else:
+        return redirect('/')
 # ---- Location END
 
 # ---- Monster
-
-
 class MonstersInLocation(ListView):
-
     model = Monster
     template_name = 'items/location_detail.html'
     context_object_name = 'monsters'
-
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['name'] = Location.objects.get(slug=self.kwargs['slug'])
@@ -123,20 +109,6 @@ class MonstersInLocation(ListView):
         slug = Location.objects.get(slug=self.kwargs['slug'])
         if slug:
             return Monster.objects.filter(locations=slug)
-
-
-# class Set_user(FormView):
-#     template_name = "items/createmonster.html"
-#     form_class = MonsterForm
-#     success_url = '/'
-
-#     def form_valid(self, form):
-#         name = form.cleaned_data.get('name')
-#         instance = Monster(name=name, locations=location)
-#         instance.save()
-#         instance.location.add(request.location.name)
-#         instance.save()
-#         return redirect("/")
 
 
 @login_required
@@ -163,45 +135,40 @@ def createmonster(request):
 @login_required
 def viewmonster(request, slug):
     monster = get_object_or_404(Monster, slug=slug)
-    if request.method == 'GET':
-        form = MonsterForm(instance=monster)
-        return render(request, 'items/viewmonster.html', {
-            'monster': monster,
-            'form': form
-        })
-    else:
-        try:
-            form = MonsterForm(request.POST, request.FILES, instance=monster)
-            form.save()
-            return redirect('home')
-        except ValueError:
+    if monster.user == request.user or request.user.has_perm('auth.change_user'):
+        if request.method == 'GET':
+            form = MonsterForm(instance=monster)
             return render(request, 'items/viewmonster.html', {
                 'monster': monster,
-                'form': MonsterForm(),
-                'error': 'Bad info'
+                'form': form
             })
-
+        else:
+            try:
+                form = MonsterForm(request.POST, request.FILES, instance=monster)
+                form.save()
+                return redirect('home')
+            except ValueError:
+                return render(request, 'items/viewmonster.html', {
+                    'monster': monster,
+                    'form': MonsterForm(),
+                    'error': 'Bad info'
+                })
+    else:
+        return redirect('/')
 
 @login_required
 def deletemonster(request, slug):
     monster = get_object_or_404(Monster, slug=slug)
-    if request.method == 'POST':
-        monster.delete()
-        return redirect('home')
-
-
+    if monster.user == request.user or request.user.has_perm('auth.change_user'):
+        if request.method == 'POST':
+            monster.delete()
+            return redirect('home')
+    else:
+        return redirect('/')
 # ---- Monster END
 
-# def get_queryset(self):
-#     slug = Location.objects.get(slug=self.kwargs['slug'])
-#     if slug:
-#         return Monster.objects.filter(locations=slug)
-
 # ---- Item
-
-
 class ItemInMonster(ListView):
-
     model = Item
     template_name = 'items/monster_detail.html'
     context_object_name = 'items'
@@ -252,33 +219,36 @@ def createitem(request):
 @login_required
 def viewitem(request, slug):
     item = get_object_or_404(Item, slug=slug)
-    if request.method == 'GET':
-        form = ItemForm(instance=item)
-        return render(request, 'items/viewitem.html', {
-            'item': item,
-            'form': form
-        })
-    else:
-        try:
-            form = ItemForm(request.POST, request.FILES, instance=item)
-            form.save()
-            return redirect('home')
-        except ValueError:
+    if item.user == request.user or request.user.has_perm('auth.change_user'):
+        if request.method == 'GET':
+            form = ItemForm(instance=item)
             return render(request, 'items/viewitem.html', {
                 'item': item,
-                'form': ItemForm(),
-                'error': 'Bad info'
+                'form': form
             })
-
+        else:
+            try:
+                form = ItemForm(request.POST, request.FILES, instance=item)
+                form.save()
+                return redirect('home')
+            except ValueError:
+                return render(request, 'items/viewitem.html', {
+                    'item': item,
+                    'form': ItemForm(),
+                    'error': 'Bad info'
+                })
+    else:
+        return redirect('/')
 
 @login_required
 def deleteitem(request, slug):
     item = get_object_or_404(Item, slug=slug)
-    if request.method == 'POST':
-        item.delete()
-        return redirect('home')
-
-
+    if item.user == request.user or request.user.has_perm('auth.change_user'):
+        if request.method == 'POST':
+            item.delete()
+            return redirect('home')
+    else:
+        return redirect('/')
 # ---- Item END
 
 
@@ -309,41 +279,40 @@ def createcategory(request):
 
 @login_required
 def viewcategory(request, slug):
-    location = get_object_or_404(Location, slug=slug)
-    if location.user == request.user:
-        # location = Location.objects.filter(slug=slug, user=request.user)
-        if request.method == 'GET':
-            form = LocationForm(instance=location)
-            return render(request, 'items/viewlocation.html', {
-                'location': location,
-                'form': form
-            })
-        else:
-            try:
-                form = LocationForm(request.POST,
-                                    request.FILES,
-                                    instance=location)
-                form.save()
-                return redirect('home')
-            except ValueError:
-                return render(
-                    request, 'items/viewlocation.html', {
-                        'location': location,
-                        'form': LocationForm(),
-                        'error': 'Bad info'
-                    })
+    category = get_object_or_404(Category, slug=slug)
+    if category.user == request.user or request.user.has_perm('auth.change_user'):
+            if request.method == 'GET':
+                form = CategoryForm(instance=category)
+                return render(request, 'items/viewcategory.html', {
+                    'category': category,
+                    'form': form
+                })
+            else:
+                try:
+                    form = CategoryForm(request.POST,
+                                        request.FILES,
+                                        instance=category)
+                    form.save()
+                    return redirect('home')
+                except ValueError:
+                    return render(
+                        request, 'items/viewlocation.html', {
+                            'category': category,
+                            'form': CategoryForm(),
+                            'error': 'Bad info'
+                        })
     else:
-        return HttpResponse("Here's the text of the Web page.")
+        return redirect('/')
 
 
 @login_required
 def deletecategory(request, slug):
-    location = get_object_or_404(Category, slug=slug)
-    if request.method == 'POST':
-        location.delete()
-        return redirect('home')
-
-
+    category = get_object_or_404(Category, slug=slug)
+    if category.user == request.user or request.user.has_perm('auth.change_user'):
+        if request.method == 'POST':
+            category.delete()
+            return redirect('/')
+    return redirect('/')
 # ---- Category END
 
 
@@ -400,16 +369,11 @@ def logoutuser(request):
     if request.method == 'POST':
         logout(request)
         return redirect('/')
-
-
 # ---- User END
 
 
 class SearchView(ListView):
     template_name = 'items/search_result.html'
-
-    # def get_queryset(self): # новый
-    #     return Item.objects.filter(name__icontains='сундук')
 
     def get(self, request, *args, **kwargs):
         context = {}
@@ -423,10 +387,7 @@ class SearchView(ListView):
             # Ищем по всем моделям
             # и объединяем выдачу
             final_set = list(chain(*query_sets))
-           
-            # final_set.sort(key=lambda x: x.pub_date, reverse=True)  #  Выполняем сортировку
             context['last_question'] = '?q=%s' % q
-
             current_page = Paginator(final_set, 10)
             page = request.GET.get('page')
             try:
@@ -437,53 +398,3 @@ class SearchView(ListView):
                 context['object_list'] = current_page.page(current_page.num_pages)
 
         return render(request=request, template_name=self.template_name, context=context)
-
-
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context['name'] = Monster.objects.get(slug=self.kwargs['slug'])
-#         return context
-
-#     def get_queryset(self):
-#         slug = Monster.objects.get(slug=self.kwargs['slug'])
-#         if slug:
-#             return Item.objects.filter(monster=slug)
-
-
-
-
-# def get_comment(request):
-#     slug = Monster.objects.all()
-#     if slug:
-#         items = Item.objects.filter(monster=slug)
-#         if request.method == 'POST':
-#             form = CommentForm(request.POST)
-#             if form.is_valid():
-#                 form.save()
-#                 return HttpResponseRedirect(request.path_info)
-
-#         else:
-#             form = CommentForm()
-#             names = Reviews.objects.all()
-#     else:
-#         items = Item.objects.all()
-#     monsters = Monster.objects.all()
-#     comments = Reviews.objects.all()
-#     return render(request, 'items/name.html', {
-#         'form': form,
-#         'names': names,
-#         'monsters': monsters,
-#         'items': items,
-#         'comments': comments
-#     })
-
-# def get_items(request, slug):
-#     slug = Monster.objects.get(slug=slug)
-#     if slug:
-#         items = Item.objects.filter(monster=slug)
-#     else:
-#         items = Item.objects.all()
-#     monsters = Monster.objects.all()
-#     context = {'items': items, 'monsters': monsters}
-#     return render(request, 'items/monsters.html', context)
