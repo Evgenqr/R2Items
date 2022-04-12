@@ -8,11 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# SECRET_KEY = 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2')
+SECRET_KEY = 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2'
+# SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2')
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
+DEBUG = True
+# DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
 ALLOWED_HOSTS = []
 
@@ -136,7 +136,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_DIR = os.path.join(BASE_DIR, 'templates')
 STATICFILESDIRS = [STATIC_DIR]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_DIR = os.path.join(BASE_DIR, 'media')
