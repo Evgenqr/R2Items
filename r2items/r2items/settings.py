@@ -11,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2'
 # SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-8f-z9_g*adecpj^pv+@ci9_3gb-6(kxtf4*m*9h@ndxyr*&i$2')
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 # DEBUG = bool( os.environ.get('DJANGO_DEBUG', True) )
 
@@ -97,7 +96,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru'
 
@@ -110,13 +108,6 @@ USE_L10N = True
 USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/3.2/howto/static-files/
-
-# PROJECT_ROOT = os.path.join(os.path.abspath(__file__))
-# STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
-# STATICFILES_DIRS = (
-#     os.path.join(PROJECT_ROOT, 'static'),
-# )
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
