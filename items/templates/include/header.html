@@ -1,0 +1,58 @@
+<ul class="nav position-relative">
+  <a class="navbar-brand" href="/admin">Лого</a>
+    {% if request.user.is_authenticated %}
+    <li class="nav-item dropdown position-absolute top-0 end-0">
+      
+      <a class="nav-link dropdown-toggle" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+       {{ user.username }}
+      </a>
+    
+      <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+        <li><a class="dropdown-item" href="{% url 'createlocation' %}">Добавить локацию</a></li>
+        <li><a class="dropdown-item" href="{% url 'createmonster' %}">Добавить монстра</a> </li> 
+        <li><a class="dropdown-item" href="{% url 'createitem' %}">Добавить предмет</a></li>
+        <li><a class="dropdown-item" href="{% url 'createcategory' %}">Добавить категорию предмета</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+          <form action="{% url 'logoutuser' %}" method="POST">
+            {% csrf_token %}
+            <li><button type="submit" class="btn btn-light">Выйти</button></li>
+          </form>
+        </li>        
+      </ul>
+    </li>
+  {% else %}
+    <li class="nav-item dropdown position-absolute top-0 end-0">
+  
+      <a class="btn dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+        Личный кабинет
+      </a>
+      <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
+        <li><a class="dropdown-item" href="{% url 'signupuser' %}">Регистрация</a></li>
+        <li><a class="dropdown-item" href="{% url 'loginuser' %}">Авторизация</a></li>
+      </ul>
+    </li>
+  {% endif %}  
+  </li>
+
+</ul>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary" >
+  <div class="container-fluid ">
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav  me-auto my-2 my-lg-0 navbar-nav-scroll " style="--bs-scroll-height: 100px;">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Главная</a>
+        </li>
+      </ul>
+   
+      <ul class="nav ">
+        <form class="d-flex" action="{% url 'search' %}" method="get">
+          <input class="form-control me-2" name="q"  type="search" placeholder="Поиск" aria-label="Search">
+          <button type="submit" class="btn btn-light btn-outline-primary">Поиск</button>
+        </form>
+      </ul>
+      
+    </div>
+  </div>
+</nav>

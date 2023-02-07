@@ -1,0 +1,46 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %}
+{{ name }} :: {{ block.super }}
+{% endblock %}
+{% block content %}
+
+<h5> Автор: {{  name.user}} </h5>
+{% if request.user.is_authenticated and request.user == name.user or request.user.is_superuser  %}
+<h2> <img src="{{name.monster_img.url}}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/>
+  {{ name }}<a href="view/" class="text-decoration-none" title="Редактировать">  &#9998; </a> </h2>
+  {% else %}
+  <h2> 
+    <img src="{{name.monster_img.url}}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> {{ name }} </h2>
+{% endif %}
+    <div class="col-md-12">
+        <div class="row">
+             {% for item in items %} 
+                <div class="card col-md-3 p-0 mb-3 mt-3">    
+                    <div class="card-body text-center">
+                        <h5 class="card-title">  <img src="{{ item.item_img.url }}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> <br>
+                        <a href="/item/{{ item.slug }}/" class="text-decoration-none"> {{ item.name }} </a></h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <a href="/item/{{ item.slug }}/" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>    
+        <form action="" method="post">
+            {% csrf_token %}
+          
+            {% if names %}
+              {% for name in names %}
+                {{ name.name }}<br>
+              {% endfor %}
+            {% endif %}
+          
+            {{ form }}
+            <!-- <input type="submit" value="Submit"> -->
+          </form>
+  
+
+
+    </div>
+{% endblock content %} 

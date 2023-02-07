@@ -1,0 +1,29 @@
+
+
+
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %}
+{{ title }} :: {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h2>Поиск</h2>
+    {% if object_list %}
+            <div class="row">
+                {% for object in object_list %}
+                   <div class="card col-md-3 p-0 mb-3 mt-3">    
+                       <div class="card-body text-center">
+                           <h5 class="card-title"> 
+                           <a href="{{object.get_absolute_url}}" class="text-decoration-none"> {{ object.name }} </a></h5>
+                       </div>
+                       <div class="card-body text-center">
+                           <a href="{{object.get_absolute_url}}" class="btn btn-primary">Подробнее</a>
+                       </div>
+                   </div>
+               {% endfor %}
+           </div> 
+    {% else %}
+        <p>Не найдено публикаций по вашему запросу<br>Попробуйте повторить запрос с другой формулировкой</p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'base.html' %} 
+{% load static %}
+{% block title %}
+{{ name }} :: {{ block.super }}
+{% endblock %}
+{% block content %}
+
+<h5> Автор: {{  name.user}} </h5>
+{% if request.user.is_authenticated and request.user == name.user or request.user.is_superuser  %}
+
+<h2> {{ name }} <a href="view/" class="text-decoration-none" title="Редактировать">  &#9998; </a> </h2>
+  {% else %}
+  <h2> {{ name }} </h2>
+{% endif %}
+    <div class="col-md-12">
+        <div class="row">
+                <div class="card col-md-3 p-0 mb-3 mt-3">   
+                    <div class="card-body text-center">
+                        <img src="{{ items.item_img.url }}" alt="image" class="img-fluid rounded-start" width="70px" height="110px"/> <br>
+                        <h5 class="card-title">{{ items.name }}  </h5>
+                        <h6 class="card-title">Вес: {{ items.weight }}  </h6>
+                        <strong>{{ items.category }}</strong> <br>
+                        <dl class="dl-horizontal">
+                            Описание: 
+                           <dd > {{ items.description }} </dd>
+                        </dl>
+                        Выпадает с: <br>
+                        {% for mob in items.monster.all %}
+                                <h6 class="card-title">   
+                                    <a href="/monster/{{ mob.slug }}/" class="text-decoration-none"> {{ mob.name }} </a>
+                                </h6>
+                        {% endfor %}
+                    </div>
+                   
+                    </div>
+        </div>    
+    </div>
+{% endblock content %} 

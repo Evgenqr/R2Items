@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} {{ monster.name }}
+{%  endblock title  %}
+{% block content %}
+{{ error }}
+{{ location.title }}
+<form method="POST" enctype="multipart/form-data" action="{% url 'viewlocation' location.slug %}">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+
+<p>
+<form method="POST" action="{% url 'deletelocation' location.slug %}">
+    {% csrf_token %}
+<button type="submit"  class="btn btn-danger">Удалить</button>
+</form>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,23 @@
+<div class="card">
+    <div class="header">
+      <h3>База р2 <i class="fas fa-angle-down iconM"></i></h3>
+    </div>
+    <div class="body">
+        
+      <ul>
+        <li><i class="fas fa-home icon"></i><a href="{% url 'home' %}"> Home</a></li>
+        <!-- <li><i class="fas fa-underline icon"></i> Tipography</li>
+        <li><i class="fas fa-boxes icon"></i> Widgets</li>
+        <li><i class="fas fa-table icon"></i> Tables</li> -->
+        <li><i class="fab fa-wpforms icon"></i> Locations
+          <ul>
+              {% comment %} {% for location in locations %}
+            <li><i class="fas fa-pencil-alt icon"></i><a href="{% url 'location_detail' location.slug %}">  {{ location.title }}</a></li>
+            
+            {% endfor %} {% endcomment %}
+          </ul>
+        </li>
+        <li><i class="fas fa-chart-pie icon"></i> Charts</li>
+      </ul>
+    </div>
+  </div>

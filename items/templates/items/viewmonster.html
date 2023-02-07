@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{{ error }}
+{{monster.name}}
+<form method="POST" enctype="multipart/form-data" action="{% url 'viewmonster' monster.slug %}">
+    {% csrf_token %}
+    {{form.as_p}}
+    <button type="submit" class="btn btn-success">Сохранить</button>
+</form>
+
+<p>
+<form method="POST" action="{% url 'deletemonster' monster.slug %}">
+    {% csrf_token %}
+<button type="submit"  class="btn btn-danger">Удалить</button>
+</form>
+
+{% endblock %}
+
+
+
